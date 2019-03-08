@@ -1,0 +1,24 @@
+<main>
+
+  <view class="left">
+    <navigator
+      open-type="navigateBack"
+      delta="1"
+    >
+      <image src="../../assets/icons/back.png" mode="aspectFit"></image>
+    </navigator>
+  </view>
+  <input name="userId" type="text" placeholder-class="input-placeholder"
+    maxlength="50" placeholder="用户名"
+    bindinput="onUserIdInput" value="{{userId}}"
+  />
+  <input name="appid" value="{{appid}}" type="text" placeholder-class="input-placeholder" 
+    maxlength="140" placeholder="修改APP_ID"
+    bindinput="onAppidInput"
+  />
+  <input name="url" type="text" placeholder-class="input-placeholder" 
+    maxlength="-1" placeholder="修改信令地址"
+    bindinput="onUrlInput" value="{{url}}"
+  />
+  <button class="plain" bind:tap="onSubmit">保存</button>
+</main>

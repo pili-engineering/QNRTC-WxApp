@@ -1,0 +1,22 @@
+{
+  "name": "pili-rtc-wxapp-demo",
+  "version": "1.0.0-beta.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pili-engineering/QNRTC-WxApp.git"
+  },
+  "author": "cuyl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pili-engineering/QNRTC-WxApp/issues"
+  },
+  "homepage": "https://github.com/pili-engineering/QNRTC-WxApp#readme",
+  "dependencies": {
+    "pili-rtc-wxapp": "^1.0.0-beta.0"
+  }
+}

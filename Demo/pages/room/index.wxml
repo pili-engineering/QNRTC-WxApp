@@ -1,0 +1,71 @@
+<view class="screen" hover-class="none" hover-stop-propagation="false">
+  <view class="screen">
+    <view class="item top container right-container">
+      <live-pusher
+        class="item player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
+        autopush
+        debug="{{debug}}"
+        wx:if="{{publishPath!==''}}"
+        beauty="{{beauty}}"
+        enable-camera="{{camera}}"
+        min-bitrate="200"
+        max-bitrate="400"
+        mode="RTC"
+        muted="{{!mic}}"
+        url="{{publishPath}}"
+      >
+      <cover-view class="mask" bind:longpress="toggleDebug">
+        
+      </cover-view>
+      </live-pusher>
+      <live-player
+        class="item player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-6 row-6' : 'col-6 row-6'}}"
+        wx:key="{{item.key}}"
+        wx:for="{{subscribeList}}"
+        autoplay
+        binderror="livePlayerError"
+        min-cache="0.2"
+        max-cache="0.8"
+        id="{{item.key}}"
+        src="{{item.url}}"
+        mode="RTC"
+        muted="{{!volume}}"
+        object-fit="fillCrop"
+      >
+      </live-player>
+    </view>
+    <view class="container bottom">
+      <view class="container row">
+        <view class="item col-2">
+          <button bind:tap="toggleMic" class="{{mic ? 'icon-mic' : 'icon-mic-off'}}">
+          </button>
+        </view>
+        <view class="item col-2">
+          <button bind:tap="toggleVolume" class="{{volume ? 'icon-volume-up' : 'icon-volume-off'}}">
+          </button>
+        </view>
+        <view class="item col-2">
+          <button bind:tap="onPhoneTab" class="icon-phone">
+          </button>
+        </view>
+        <view class="item col-2">
+          <button bind:tap="toggleBeauty" class="icon">
+            <image
+              src="{{beauty ? '../../assets/icons/face_beauty_open.png' : '../../assets/icons/face_beauty_close.png'}}"
+              mode="aspectFit"
+              lazy-load="false"
+              style="{{beauty ? 'width: 48px;height: 48px;': 'width: 30px;height: 48px;'}}"
+            >
+            </image>
+          </button>
+        </view>
+        <view class="item col-2">
+          <button bind:tap="switchCamera" class="icon">
+            <image src="../../assets/icons/camera_switch_end.png" mode="aspectFit" lazy-load="false" binderror="" bindload="">
+            </image>
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

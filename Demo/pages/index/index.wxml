@@ -1,0 +1,18 @@
+<main>
+  <view class="right">
+    <navigator
+      url="/pages/setting/index"
+    >
+      <image src="../../assets/icons/setting.png" mode="aspectFit"></image>
+    </navigator>
+  </view>
+  <input name="userId" type="text" placeholder-class="input-placeholder"
+    maxlength="50" placeholder="用户名"
+    bindinput="onUserIdInput" value="{{userId}}"
+  />
+  <input name="roomName" type="text" placeholder-class="input-placeholder" 
+    maxlength="64" focus placeholder="房间名名称"
+    bindinput="onRoomNameInput" value="{{roomName}}"
+  />
+  <button class="plain" bind:tap="onSubmit">会议房间</button>
+</main>
