@@ -63,6 +63,8 @@ Page({
     this.initRoom(appid, room, userid, app.url)
   },
   onShow() {
+    // 保持屏幕常亮
+    wx.setKeepScreenOn({ keepScreenOn: true });
     console.log('onShow' + Date.now().valueOf())
     // onShow 中直接调用 play 无效
     wx.nextTick(() => {
@@ -243,7 +245,8 @@ Page({
       },
     })
   },
-  obHide() {
+  onHide() {
+    wx.setKeepScreenOn({ keepScreenOn: false });
     console.log('onHide')
   },
   onUnload() {
