@@ -1,10 +1,10 @@
 {
-  "pages":[
+  "pages": [
     "pages/index/index",
     "pages/room/index",
     "pages/setting/index"
   ],
-  "window":{
+  "window": {
     "navigationStyle": "custom"
   },
   "permission": {
@@ -14,5 +14,6 @@
     "scope.camera": {
       "desc": "将使用您的摄像头用于视频通话"
     }
-  }
+  },
+  "sitemapLocation": "sitemap.json"
 }
