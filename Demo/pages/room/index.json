@@ -1,3 +1,7 @@
 {
-  "disableScroll": true
+  "disableScroll": true,
+  "usingComponents": {
+    "player": "/miniprogram_npm/qiniu-wx-player/live-player/index",
+    "pusher": "/miniprogram_npm/qiniu-wx-player/live-pusher/index"
+  }
 }

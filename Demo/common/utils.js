@@ -68,7 +68,8 @@ export const checkPermission = () => {
       
           console.log('摄像头权限:' + cameraAuthorized)
           console.log('麦克风权限:' + microphoneAuthorized)
-          if (cameraAuthorized === false ||  microphoneAuthorized === false) {
+          // cameraAuthorized & microphoneAuthorized 在 小程序 lib 2.6.0 开始支持
+          if (cameraAuthorized === false || microphoneAuthorized === false) {
             wx.showModal({
               title: '缺少权限',
               content: '请前往系统设置打开微信的摄像头和麦克风权限',
