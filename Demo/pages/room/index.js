@@ -16,6 +16,7 @@ Page({
     subscribeList: [],
     remoteTracks: [],
     debug: false,
+    isShowToast: false,
     createMergeJob: {
       id: null,
       w: 480,
@@ -31,7 +32,8 @@ Page({
       y: 0,
       z: 0,
       w: 240,
-      h: 160
+      h: 160,
+      stretchMode: 'aspectFill'
     },
     stopMerge: {
       id: null
@@ -68,7 +70,11 @@ Page({
       wx.redirectTo({
         url: '/pages/index/index',
         success: () => {
-          wx.hideToast()
+          wx.hideToast({
+            fail: () => {
+              console.log('消息隐藏失败')
+            }
+          })
           wx.showToast({
             title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
             icon: 'none',
@@ -82,7 +88,11 @@ Page({
       wx.redirectTo({
         url: '/pages/index/index',
         success: () => {
-          wx.hideToast()
+          wx.hideToast({
+            fail: () =>{
+              console.log('消息隐藏失败')
+            }
+          })
           wx.showToast({
             title: '房间名最少 3 个字符，并且只能包含字母、数字或下划线',
             icon: 'none',
@@ -100,7 +110,10 @@ Page({
   },
   onShow() {
     // 保持屏幕常亮
-    wx.setKeepScreenOn({ keepScreenOn: true })
+    wx.setKeepScreenOn({
+      keepScreenOn: true,
+      fail: () => {console.log('保持常亮状态失败')}
+    })
     console.log('onShow' + Date.now().valueOf())
     // onShow 中直接调用 play 无效
   },
@@ -125,6 +138,11 @@ Page({
     const value = type === 'number' ? Number(e.detail.value) : e.detail.value
     this.handleMergeInput('createMergeJob', name, value)
   },
+  handleCreateMergeJobStretchMode(e) {
+    const idx = e.detail.value
+    const value = this.data.merge.stretchModeOptions[idx]
+    this.handleMergeInput('createMergeJob', 'stretchMode', value)
+  },
   handleUpdateMergeTracksInput(e) {
     const name = e.target.dataset.key
     const type = e.target.dataset.type
@@ -135,6 +153,11 @@ Page({
     const idx = e.detail.value
     const value = this.data.remoteTracks[idx]
     this.handleMergeInput('updateMergeTracks', 'trackid', value)
+  },
+  handleUpdateMergeJobStretchMode(e) {
+    const idx = e.detail.value
+    const value = this.data.merge.stretchModeOptions[idx]
+    this.handleMergeInput('updateMergeTracks', 'stretchMode', value)
   },
   handleStopMergeInput(e) {
     const name = e.target.dataset.key
@@ -152,7 +175,7 @@ Page({
     const session = this.data.session
     if (createMergeJob.id == null) {
       return
-    } 
+    }
     session.createMergeJob(createMergeJob.id, createMergeJob)
   },
   addMergeTracks() {
@@ -160,17 +183,20 @@ Page({
     if (updateMergeTracks.id == null) {
       return
     }
-    const tracks = (session.tracks || []).concat(session.localTracks)
-    const allTracks = tracks.map((track, idx) => {
-      return Object.assign({}, updateMergeTracks, { trackid: track.trackid, y: updateMergeTracks.y + 150 * idx })
-    })
+    const allTracks = []
+    allTracks.push(Object.assign({}, updateMergeTracks, { trackid: updateMergeTracks.trackid }))
+    // const tracks = (session.tracks || []).concat(session.localTracks)
+    // const allTracks = tracks.map((track, idx) => {
+    //   return Object.assign({}, updateMergeTracks, { trackid: track.trackid, y: updateMergeTracks.y + 150 * idx })
+    // })
+    console.log('allTracks', allTracks)
     session.addMergeTracks(allTracks, updateMergeTracks.id)
   },
   removeMergeTracks() {
     const { updateMergeTracks, session } = this.data
     if (updateMergeTracks.id == null) {
       return
-    } 
+    }
     session.removeMergeTracks([updateMergeTracks], updateMergeTracks.id)
   },
   stopMerge() {
@@ -229,7 +255,11 @@ Page({
           .forEach(v => {
             this.subscribe(v.playerid)
           })
-        wx.hideToast()
+          wx.hideToast({
+            fail: () => {
+              console.log('消息隐藏失败')
+            }
+          })
       })
       .catch(err => {
         console.log('加入房间失败', err)
@@ -275,10 +305,10 @@ Page({
     console.log('session:', session)
     const addressList = session.getSubscribeAddressList(playerid)
     console.log('AddressList: ', addressList)
-    if (subscribeList.length + addressList.length > 9) {
-      return wx.showToast({ title: '最多订阅9条流', icon: 'none' })
-    }
-    if (addressList.length > 0) {
+    if (addressList) {
+      if (subscribeList.length + addressList.length > 9) {
+        return wx.showToast({ title: '最多订阅9条流', icon: 'none' })
+      }
       const sub = subscribeList.filter(v => v.userid !== playerid)
       const urlList = []
       addressList.map(((item, index)=> {
@@ -300,7 +330,10 @@ Page({
   startPush() {
   },
   onHide() {
-    wx.setKeepScreenOn({ keepScreenOn: false })
+    wx.setKeepScreenOn({
+      keepScreenOn: false,
+      fail: () => {console.log('保持常亮状态失败')}
+    })
     console.log('onHide')
   },
   onUnload() {
@@ -350,7 +383,6 @@ Page({
       const set = {}
       for (const track of tracks) {
         remoteTracks.push(track.trackid)
-        console.log('-------tracks-------' + tracks)
         // 每个 playerid 只订阅一次
         if (!set[track.playerid]) {
           set[track.playerid] = true
@@ -361,25 +393,28 @@ Page({
     })
     session.on('track-remove', (tracks) => {
       console.log('track-remove', tracks)
-      const remoteTracks = this.data.remoteTracks
+      const {remoteTracks, subscribeList} = this.data
       for (const track of tracks) {
-        const idx = remoteTracks.indexOf(tracks.trackid)
+        const idx = remoteTracks.indexOf(track.trackid)
         if (idx !== -1) {
           remoteTracks.splice(idx, 1)
         }
+        subscribeList.map((ele, index) => {
+          if (ele.url.indexOf(track.trackid) !== -1) {
+            return subscribeList.splice(index, 1)
+          }
+        })
       }
-      this.setData({
-        remoteTracks,
-        subscribeList: this.data.subscribeList
-          .filter(v => !tracks.reduce((accumulator, currentValue) =>
-            accumulator && v.url.includes(currentValue.trackid), true)),
-      })
+      this.setData({ remoteTracks, subscribeList })
+      console.log('track-remove-data', this.data)
     })
     session.on('user-leave', (user) => {
       console.log('user-leave', user)
+      console.log('leave subscribeList', this.data.subscribeList)
       this.setData({
-        subscribeList: this.data.subscribeList.filter(v => v.key !== user.playerid),
+        subscribeList: this.data.subscribeList.filter(v => v.userid !== user.playerid),
       })
+      console.log('user-leave`subscribeList:', this.data.subscribeList)
     })
     session.on('user-join', (user) => {
       console.log('user-join', user)
@@ -439,7 +474,11 @@ Page({
           ctx.play()
         }
       }
-      wx.hideToast()
+      wx.hideToast({
+        fail: () => {
+          console.log('消息隐藏失败')
+        }
+      })
     })
   },
   reconnect() {
@@ -462,14 +501,22 @@ Page({
       const app = getApp()
       if (app.roomToken) {
         this.initRoomWithToken(app.roomToken, app.url).then(() => {
-          wx.hideToast()
+          wx.hideToast({
+            fail: () => {
+              console.log('消息隐藏失败')
+            }
+          })
         }).catch(e => {
           console.log(`reconnect failed: ${e}`)
           return this.reconnect()
         })
       } else if (this.appid && this.roomName && this.userid) {
         this.initRoom(this.appid, this.roomName, this.userid, app.url).then(() => {
-          wx.hideToast()
+          wx.hideToast({
+            fail: () => {
+              console.log('消息隐藏失败')
+            }
+          })
         }).catch(e => {
           console.log(`reconnect failed: ${e}`)
           return this.reconnect()
