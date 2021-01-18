@@ -19,8 +19,8 @@ Page({
     isShowToast: false,
     createMergeJob: {
       id: null,
-      w: 480,
-      h: 320,
+      width: 720,
+      height: 1280,
       stretchMode: 'aspectFill',
       publishUrl: 'rtmp://123.59.184.113:1935/jztest11/merge_test_job?domain=pili-publish.jztest11.test.cloudvdn.com',
       subscribeUrl: 'rtmp://123.59.184.113:1935/jztest11/merge_test_job?domain=pili-live-rtmp.jztest11.test.cloudvdn.com'
@@ -61,6 +61,7 @@ Page({
       title: '加入房间中',
       icon: 'loading',
       mask: true,
+      fail: data => console.log('fail', data)
     })
     if (app.roomToken) {
       this.initRoomWithToken(app.roomToken)
@@ -78,7 +79,8 @@ Page({
           wx.showToast({
             title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
             icon: 'none',
-            duration: 2000
+            duration: 2000,
+            fail: data => console.log('fail', data)
           })
         }
       })
@@ -96,7 +98,8 @@ Page({
           wx.showToast({
             title: '房间名最少 3 个字符，并且只能包含字母、数字或下划线',
             icon: 'none',
-            duration: 2000
+            duration: 2000,
+            fail: data => console.log('fail', data)
           })
         }
       })
@@ -215,7 +218,7 @@ Page({
   },
   livePusherError(e) {
     if (Number(e.code) < 0) {
-      wx.showToast({ title: '发布失败' })
+      wx.showToast({ title: '发布失败' ,fail: data => console.log('fail', data)})
     }
     console.error('live-pusher error:', e.detail.code, e.detail.errMsg)
   },
@@ -269,6 +272,7 @@ Page({
             wx.showToast({
               title: '加入房间失败',
               icon: 'none',
+              fail: data => console.log('fail', data)
             })
           }
         })
@@ -307,7 +311,7 @@ Page({
     console.log('AddressList: ', addressList)
     if (addressList) {
       if (subscribeList.length + addressList.length > 9) {
-        return wx.showToast({ title: '最多订阅9条流', icon: 'none' })
+        return wx.showToast({ title: '最多订阅9条流', icon: 'none' ,fail: data => console.log('fail', data)})
       }
       const sub = subscribeList.filter(v => v.userid !== playerid)
       const urlList = []
@@ -342,12 +346,28 @@ Page({
   },
   toggleMic() {
     this.setData({ mic: !this.data.mic })
+    const { session } = this.data
+    const mic = this.data.mic
+    console.log('mic', mic)
+    if (session.localTracks.length === 0) {
+      return
+    }
+    const tracks = session.localTracks.filter(t => t.kind === 'audio').map(ele => ({trackid: ele.trackid, muted: !mic}))
+    session.muteTracks(tracks)
   },
   toggleVolume() {
     this.setData({ volume: !this.data.volume })
   },
   toggleCamera() {
     this.setData({ camera: !this.data.camera })
+    const { session } = this.data
+    const camera = this.data.camera
+    console.log('camera', camera)
+    if (session.localTracks.length === 0) {
+      return
+    }
+    const tracks = session.localTracks.filter(t => t.kind === 'video').map(ele => ({trackid: ele.trackid, muted: !camera}))
+    session.muteTracks(tracks)
   },
   toggleBeauty() {
     this.setData({ beauty: this.data.beauty ? 0 : 9 })
@@ -450,6 +470,7 @@ Page({
           wx.showToast({
             title,
             icon: 'none',
+            fail: data => console.log('fail', data)
           })
         },
       })
@@ -464,6 +485,7 @@ Page({
         title: '尝试重连中...',
         icon: 'loading',
         mask: true,
+        fail: data => console.log('fail', data)
       })
     })
     session.on('reconnected', () => {
@@ -480,6 +502,9 @@ Page({
         }
       })
     })
+    session.on('mute-tracks', (tracks) => {
+      console.log('mute-tracks', tracks)
+    })
   },
   reconnect() {
     console.log('尝试重连中...')
@@ -487,6 +512,7 @@ Page({
       title: '尝试重连中...',
       icon: 'loading',
       mask: true,
+      fail: data => console.log('fail', data)
     })
     this.leaveRoom()
     this.setData({
@@ -528,6 +554,7 @@ Page({
             wx.showToast({
               title: '加入房间失败',
               icon: 'none',
+              fail: data => console.log('fail', data)
             })
           }
         })

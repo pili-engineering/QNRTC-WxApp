@@ -36,7 +36,8 @@ Page({
         wx.showToast({
           title: '房间名最少 3 个字符，并且只能包含字母、数字或下划线',
           icon: 'none',
-          duration: 2000
+          duration: 2000,
+          fail: data => console.log('fail', data)
         })
         return;
       }
@@ -47,7 +48,8 @@ Page({
         wx.showToast({
           title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
           icon: 'none',
-          duration: 2000
+          duration: 2000,
+          fail: data => console.log('fail', data)
         })
         return;
       }
