@@ -10,7 +10,7 @@
         enable-camera="{{camera}}"
         min-bitrate="200"
         max-bitrate="400"
-        mode="live"
+        mode="RTC"
         playerid="{{playerId}}"
         muted="{{!mic}}"
         url="{{publishPath}}"
@@ -28,7 +28,7 @@
         max-cache="0.8"
         playerid="{{item.key}}"
         src="{{item.url}}"
-        mode="live"
+        mode="RTC"
         muted="{{!volume}}"
         object-fit="fillCrop"
       >
@@ -44,8 +44,8 @@
         <view style="display: {{merge.step === 'createMergeJob' ? 'block' : 'none'}}" class="input">
           <view>jobid:<input placeholder="jobid" value="{{createMergeJob.id}}" data-key="id" bindinput="handleCreateMergeJobInput"/></view>
           <view>publishUrl:<input placeholder="publishUrl" value="{{createMergeJob.publishUrl}}" data-key="publishUrl" bindinput="handleCreateMergeJobInput"/></view>
-          <view>w:<input placeholder="w" value="{{createMergeJob.w}}" data-key="w" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
-          <view>h:<input placeholder="h" value="{{createMergeJob.h}}" data-key="h" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
+          <view>width:<input placeholder="width" value="{{createMergeJob.width}}" data-key="width" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
+          <view>height:<input placeholder="height" value="{{createMergeJob.height}}" data-key="height" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
           <view>fps:<input placeholder="fps" value="{{createMergeJob.fps}}" data-key="fps" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
           <view>kbps:<input placeholder="kbps" value="{{createMergeJob.kbps}}" data-key="kbps" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
           <view>
@@ -113,6 +113,7 @@
         </view>
         <view class="item col-2">
           <button bind:tap="toggleBeauty" class="icon">
+          <!-- <button bind:tap="toggleCamera" class="icon"> -->
             <image
               src="{{beauty ? '../../assets/icons/face_beauty_open.png' : '../../assets/icons/face_beauty_close.png'}}"
               mode="aspectFit"
