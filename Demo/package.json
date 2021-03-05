@@ -7,8 +7,8 @@
     "fingerprintjs2": "^2.1.2",
     "gzip-js": "^0.3.2",
     "js-base64": "^3.5.2",
-    "pili-rtc-wxapp": "^1.2.0",
-    "qiniu-wx-player": "0.0.9",
+    "pili-rtc-wxapp": "1.2.1",
+    "qiniu-wx-player": "0.1.1",
     "wolfy87-eventemitter": "^5.2.9"
   }
 }

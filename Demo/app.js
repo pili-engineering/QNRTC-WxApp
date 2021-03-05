@@ -10,4 +10,10 @@ App({
   onLaunch: function () {
     checkPermission()
   },
+  
+  onShow: function() {
+    wx.setKeepScreenOn({
+    　keepScreenOn: true,
+    })
+  }
 })
