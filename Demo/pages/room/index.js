@@ -506,6 +506,18 @@ Page({
       console.log('mute-tracks', tracks)
     })
   },
+  handlePusherStateChange(e) {
+    console.log('pusher state', e.detail.code, e.detail.message)
+  },
+  handlerPusherNetStatus(e) {
+    console.log('pusher net status', 'videoBitrate: ', e.detail.info.videoBitrate, 'audioBitrate: ', e.detail.info.audioBitrate)
+  },
+  handlePlayerStateChange(e) {
+    console.log('player state', e.detail.code, e.detail.message)
+  },
+  handlePlayerNetStatus(e) {
+    console.log('player net status', 'videoBitrate: ', e.detail.info.videoBitrate, 'audioBitrate: ', e.detail.info.audioBitrate)
+  },
   reconnect() {
     console.log('尝试重连中...')
     wx.showToast({
