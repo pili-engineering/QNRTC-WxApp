@@ -238,7 +238,9 @@ Page({
     this.setData({ session })
     const starttime = Date.now().valueOf()
     console.log(`[${starttime}] joinRoomWithToken: ${roomToken}`)
-    session.joinRoomWithToken(roomToken, '2199999')
+    session.joinRoomWithToken(roomToken, JSON.stringify({
+      name: '测试'
+    }))
       .then(() => {
         console.log('进入房间成功')
         const endtime = Date.now().valueOf()
