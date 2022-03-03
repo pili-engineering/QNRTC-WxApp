@@ -24,3 +24,15 @@ button.plain.button-hover {
   color: #FAFAFA;
   background-color: rgba(52, 170, 220, 0.808);
 }
+
+.switchItem{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24rpx;
+  padding-left: 1.5em;
+  line-height: 45px;
+  height: 45px;
+  border-radius: 90px;
+  background-color: #49494B;
+}

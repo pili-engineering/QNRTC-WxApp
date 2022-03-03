@@ -20,5 +20,9 @@
     maxlength="-1" placeholder="修改信令地址"
     bindinput="onUrlInput" value="{{url}}"
   />
+  <view class="switchItem">
+    <text>开启日志</text>
+    <switch name="log"  checked="{{islog}}" bindchange="onSwitchLog"/>
+  </view>
   <button class="plain" bind:tap="onSubmit">保存</button>
 </main>

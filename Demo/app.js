@@ -1,19 +1,20 @@
-import { checkPermission } from "./common/utils";
+import { checkPermission } from './common/utils'
 
 App({
   roomName: undefined,
-  appid: 'd8lk7l4ed',
+  appid: 'g2m0ya7w7',
+  islog: true,
   userId: undefined,
   roomToken: undefined,
   url: 'wss://rtmpgate.cloudvdn.com/',
 
-  onLaunch: function () {
+  onLaunch() {
     checkPermission()
   },
-  
-  onShow: function() {
+
+  onShow() {
     wx.setKeepScreenOn({
-    　keepScreenOn: true,
+      keepScreenOn: true,
     })
   }
 })

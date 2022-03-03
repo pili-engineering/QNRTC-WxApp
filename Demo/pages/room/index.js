@@ -1,7 +1,9 @@
-import { RoomSession } from 'pili-rtc-wxapp'
+import { RoomSession, log } from 'pili-rtc-wxapp'
 import { verifyRoomId, verifyUserId } from '../../common/utils'
 import { getToken } from '../../common/api'
 
+// eslint-disable-next-line no-undef
+const app = getApp()
 Page({
   data: {
     token: '',
@@ -51,7 +53,6 @@ Page({
   },
   onLoad(query) {
     console.log(query)
-    const app = getApp()
     const appid = query.appid || app.appid
     const userid = query.userId || wx.getStorageSync('userId')
     const room = query.room
@@ -226,6 +227,9 @@ Page({
     console.error('live-player error:', e.detail.code, e.detail.errMsg)
   },
   joinRoom(roomToken, url) {
+    if (app.islog === false) {
+      log.setLevel('disable')
+    }
     let session
     if (url) {
       session = new RoomSession({
@@ -390,7 +394,6 @@ Page({
     console.log('url:', url)
     return getToken(appid, room, userid)
       .then(token => {
-        const app = getApp()
         app.url = url
         return this.joinRoom(token, url)
       })
@@ -538,7 +541,6 @@ Page({
       pushContext.stop()
     }
     this.reconnectTimer = setTimeout(() => {
-      const app = getApp()
       if (app.roomToken) {
         this.initRoomWithToken(app.roomToken, app.url).then(() => {
           wx.hideToast({
