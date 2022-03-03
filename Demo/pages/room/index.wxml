@@ -3,6 +3,8 @@
     <view class="item top container right-container">
       <pusher
         class="item player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
+        id="pusher"
+        pid="mypusher"
         autopush
         debug="{{debug}}"
         wx:if="{{publishPath!==''}}"
@@ -23,6 +25,8 @@
       </pusher>
       <player
         class="item player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-6 row-6' : 'col-6 row-6'}}"
+        id="player{{index}}"
+        pid="myplayer{{index}}"
         wx:key="key"
         wx:for="{{subscribeList}}"
         autoplay
