@@ -1,4 +1,3 @@
-
 page {
   position: relative;
   width: 100%;
@@ -6,3 +5,185 @@ page {
   color: #fff;
   background-color: #000;
 }
+button {
+  padding: 0;
+  margin: 0;
+}
+button::after {
+  border: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-end {
+  justify-content: end;
+}
+
+.text-sm {
+  font-size:28rpx
+}
+
+.margin-top-15 {
+  margin-top: 15rpx;
+}
+
+.margin-top-30 {
+  margin-top: 30rpx;
+}
+
+.margin-top-60 {
+  margin-top: 60rpx;
+}
+
+.margin-left-20 {
+  margin-left: 20rpx;
+}
+
+.padding-20 {
+  padding: 20rpx;
+}
+
+.font-size-30 {
+  font-size: 30rpx;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn {
+  position: relative;
+  border: 0rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 30rpx;
+  font-size: 28rpx;
+  height: 64rpx;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  overflow: visible;
+  transform: translate(0rpx, 0rpx);
+  margin-right: initial;
+  border-radius: 5000rpx;
+}
+
+.col-2 {
+  width: 16.666%;
+}
+
+.col-4 {
+  width: 33.333%;
+}
+
+.col-6 {
+  width: 50%;
+}
+
+.col-12 {
+  width: 100%;
+}
+
+.row-4 {
+  height: 33.33%;
+}
+
+.row-6 {
+  height: 50%;
+}
+
+.row-12 {
+  height: 100%;
+}
+
+.box-shadow-top{
+  box-shadow: 0 -1px 1px -1px #555;
+  position: relative;
+}
+
+.color-normal {
+  color: #8799a3;
+}
+
+.color-danger {
+  color: #e54d42;
+}
+
+.color-white {
+  color: white;
+}
+
+.color-warning {
+  color: #fbbd08;
+}
+
+.bg-white {
+  background: white;
+}
+
+.bg-danger {
+  background: #e54d42;
+  color: #fafafa;
+}
+
+.bg-warning {
+  background: #fbbd08;
+}
+
+.bg-normal {
+  background-color: rgba(52, 170, 220, 0.808);
+  color: #fafafa;
+}
+
+.form-group {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  min-height: 100rpx;
+  justify-content: space-between;
+  padding: 0 20rpx;
+}
+
+.form-group .title {
+  color: #8799a3;
+  text-align: justify;
+  padding-right: 20rpx;
+  font-size: 30rpx;
+  position: relative;
+  height: 60rpx;
+  line-height: 60rpx;
+}
+
+.form-group input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #555;
+  margin-right: 20rpx;
+  border-bottom: 1rpx solid #8799a3;
+}
+
+.form-group textarea {
+  margin: 32rpx 0 30rpx;
+  height: 4.6em;
+  width: 100%;
+  line-height: 1.2em;
+  flex: 1;
+  font-size: 28rpx;
+  padding: 0;
+}
+
+.form-group picker {
+  flex: 1;
+  padding-right: 40rpx;
+  overflow: hidden;
+  position: relative;
+}
+

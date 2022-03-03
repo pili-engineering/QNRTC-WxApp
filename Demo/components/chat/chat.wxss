@@ -1,0 +1,54 @@
+.chat{
+    background:#f1f1f1;
+    position: fixed;
+    bottom:0;
+    box-sizing: border-box;
+    left:0;
+    width:100vw;
+    min-height:100rpx;
+    height:auto;
+    z-index: 100000;
+    display:flex;
+    flex-direction: column;
+    max-height:100vh;
+    transition: all .3s
+}
+
+.chat-modal{
+    position: fixed;
+    top:0;
+    left:0;
+    height:100vh;
+    width:100vw;
+    background:rgba(0,0,0,0.2)
+}
+
+.chat-hide{
+    min-height:0;
+    box-sizing: content-box;
+    padding-bottom:0;
+    overflow: hidden;
+}
+
+.chat-show{
+    box-sizing: border-box;
+}
+
+.chat-submit-merge{
+    width:100%;
+    height:100rpx;
+    border-radius: 0;
+    line-height:100rpx;
+    box-sizing: content-box;
+}
+
+.chat-submit-merge-ipx{
+    padding-bottom:34px
+}
+
+.chat-scroll-view{
+    height:calc( 800rpx - 300rpx )
+}
+.chat-ipx-scroll-view{
+    height:calc( 800rpx - 300rpx - 34px )
+}

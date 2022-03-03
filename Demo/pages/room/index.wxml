@@ -1,15 +1,17 @@
 <view class="screen" hover-class="none" hover-stop-propagation="false">
-  <view class="screen">
-    <view class="item top container right-container">
-      <pusher
-        class="item player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
-        id="pusher"
-        pid="mypusher"
+  <view class="screen-main">
+    <view class="screen-item">
+      <live-pusher
+        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
         autopush
-        debug="{{debug}}"
         wx:if="{{publishPath!==''}}"
         beauty="{{beauty}}"
+        whiteness="{{whiteness}}"
+        local-mirror="{{mirror ? 'enable' : 'disable'}}"
+        remote-mirror="{{mirror}}"
         enable-camera="{{camera}}"
+        filter="{{filterResult}}"
+        audio-reverb-type="{{audioReveb}}"
         min-bitrate="200"
         max-bitrate="400"
         mode="RTC"
@@ -20,18 +22,14 @@
         bindstatechange="handlePusherStateChange"
         bindnetstatus="handlerPusherNetStatus"
       >
-        <cover-view class="mask" bind:longpress="toggleDebug">
-        </cover-view>
-      </pusher>
-      <player
-        class="item player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-6 row-6' : 'col-6 row-6'}}"
-        id="player{{index}}"
-        pid="myplayer{{index}}"
+      </live-pusher>
+      <live-player
+        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
         wx:key="key"
         wx:for="{{subscribeList}}"
         autoplay
-        min-cache="0.2"
-        max-cache="0.8"
+        min-cache="0.1"
+        max-cache="0.1"
         playerid="{{item.key}}"
         src="{{item.url}}"
         mode="RTC"
@@ -40,104 +38,63 @@
         bindstatechange="handlePlayerStateChange"
         bindnetstatus="handlePlayerNetStatus"
       >
-      </player>
+      </live-player>
     </view>
-    <!-- <view class="container bottom1">
-      <view style="position: absolute;width: 100%;left:20px;bottom: 100px;height: 40px;">
-        <view bind:tap="handleMergeOptionsChange" data-name="createMergeJob" class="{{merge.step === 'createMergeJob' ? 'currentMergeStep' : 'mergeStep'}}">mergeJob</view>
-        <view bind:tap="handleMergeOptionsChange" data-name="updateMergeTracks" class="{{merge.step === 'updateMergeTracks' ? 'currentMergeStep' : 'mergeStep'}}">updateMergeTracks</view>
-        <view bind:tap="handleMergeOptionsChange" data-name="stopMerge" class="{{merge.step === 'stopMerge' ? 'currentMergeStep' : 'mergeStep'}}">stopMerge</view>
-      </view>
-      <scroll-view scroll-y class="merge-panel">
-        <view style="display: {{merge.step === 'createMergeJob' ? 'block' : 'none'}}" class="input">
-          <view>jobid:<input placeholder="jobid" value="{{createMergeJob.id}}" data-key="id" bindinput="handleCreateMergeJobInput"/></view>
-          <view>publishUrl:<input placeholder="publishUrl" value="{{createMergeJob.publishUrl}}" data-key="publishUrl" bindinput="handleCreateMergeJobInput"/></view>
-          <view>width:<input placeholder="width" value="{{createMergeJob.width}}" data-key="width" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
-          <view>height:<input placeholder="height" value="{{createMergeJob.height}}" data-key="height" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
-          <view>fps:<input placeholder="fps" value="{{createMergeJob.fps}}" data-key="fps" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
-          <view>kbps:<input placeholder="kbps" value="{{createMergeJob.kbps}}" data-key="kbps" data-type="number" bindinput="handleCreateMergeJobInput" /></view>
-          <view>
-            <picker mode="selector" data-key="stretchMode" bindchange="handleCreateMergeJobStretchMode" value="{{createMergeJob.stretchMode}}" range="{{merge.stretchModeOptions}}" >
-              stretchMode:{{createMergeJob.stretchMode}}
-            </picker>
+  </view>
+  <view class="sceen-aside">
+    <view bind:tap="handleStartDirectLiveStreaming" class="screen-aside-wrap">
+    <image src="../../assets/icons/cdn.png" 	mode="widthFix" class="aside-img" />
+      <view class="text-sm margin-top-15">{{directLiveStatus ? '停止转推' : '开始转推'}}</view>
+    </view>
+    <view bind:tap="handleOpenMergeList" class="screen-aside-wrap">
+    <image src="../../assets/icons/stream.png" 	mode="widthFix" class="aside-img" />
+      <view class="text-sm margin-top-15">合流设置</view>
+    </view>
+    <view bind:tap="handleOpenChat" class="screen-aside-wrap">
+    <image src="../../assets/icons/chat.png" 	mode="widthFix" class="aside-img" />
+      <view class="text-sm margin-top-15">聊天</view>
+    </view>
+  </view>
+  <view class="sceen-aside-left">
+    <view bind:tap="openBeauty" class="screen-aside-wrap">
+      <image src="../../assets/icons/beautify.png" 	mode="widthFix" class="aside-img" />
+      <view class="text-sm margin-top-15">美颜</view>
+    </view>
+    <view bind:tap="openWhiteness" class="screen-aside-wrap">
+      <image src="../../assets/icons/white.png" 	mode="widthFix" class="aside-img" />
+      <view class="text-sm margin-top-15">美白</view>
+    </view>
+    <picker mode="selector" range="{{audioRevebList}}" value="{{audioReveb}}" bindchange="toggleAudioReveb" >
+        <view class="screen-aside-wrap">
+          <image src="../../assets/icons/audio.png" 	mode="widthFix" class="aside-img" />
+          <view class="text-sm margin-top-15">
+              混响
           </view>
-          <button size="mini" type="primary" bindtap="createMergeJob">
-            创建合流job
-          </button>
         </view>
-        <view style="display: {{merge.step === 'updateMergeTracks' ? 'block' : 'none'}}" class="input">
-          <view>jobid:<input placeholder="jobid" value="{{updateMergeTracks.id}}" data-key="id" bindinput="handleUpdateMergeTracksInput" /></view>
-          <view>
-            <picker mode="selector" data-key="trackid" bindchange="handleUpdateMergeTracksIdChange" value="{{updateMergeTracks.trackid}}" range="{{remoteTracks}}" >
-              trackid:{{updateMergeTracks.trackid}}
-            </picker>
+    </picker>
+    <picker mode="selector" range="{{filterList}}" value="{{fliter}}" bindchange="toggleFilter" range-key="zh" >
+        <view class="screen-aside-wrap">
+          <image src="../../assets/icons/filter.png" 	mode="widthFix" class="aside-img" />
+          <view class="text-sm margin-top-15">
+              滤镜
           </view>
-          <view>x:<input placeholder="x" value="{{updateMergeTracks.x}}" data-key="x" data-type="number" bindinput="handleUpdateMergeTracksInput" /></view>
-          <view>y:<input placeholder="y" value="{{updateMergeTracks.y}}" data-key="y" data-type="number" bindinput="handleUpdateMergeTracksInput" /></view>
-          <view>z:<input placeholder="z" value="{{updateMergeTracks.z}}" data-key="z" data-type="number" bindinput="handleUpdateMergeTracksInput" /></view>
-          <view>w:<input placeholder="w" value="{{updateMergeTracks.w}}" data-key="w" data-type="number" bindinput="handleUpdateMergeTracksInput" /></view>
-          <view>h:<input placeholder="h" value="{{updateMergeTracks.h}}" data-key="h" data-type="number" bindinput="handleUpdateMergeTracksInput" /></view>
-          <view>
-            <picker mode="selector" data-key="stretchMode" bindchange="handleUpdateMergeJobStretchMode" value="{{updateMergeTracks.stretchMode}}" range="{{merge.stretchModeOptions}}" >
-              stretchMode:{{updateMergeTracks.stretchMode}}
-            </picker>
-          </view>
-          <button size="mini" type="primary" bindtap="addMergeTracks">
-            添加媒体流
-          </button>
-          <button size="mini" type="primary" bindtap="removeMergeTracks">
-            删除媒体流
-          </button>
         </view>
-        <view style="display: {{merge.step === 'stopMerge' ? 'block' : 'none'}}" class="input">
-          <view>jobid:<input placeholder="jobid" value="{{stopMerge.id}}" data-key="id" bindinput="handleStopMergeInput" /></view>
-          <button size="mini" type="primary" bindtap="stopMerge">
-            停止合流
-          </button>
-          <view>userid:<input placeholder="userid" value="{{sendMessage.userid}}" data-key="userid" bindinput="handleSendMessageInput" /></view>
-          <view>text:<input placeholder="text" value="{{sendMessage.text}}" data-key="text" bindinput="handleSendMessageInput" /></view>
-          <button size="mini" type="primary" bindtap="sendMessage">
-            发送消息
-          </button>
-          <button size="mini" type="primary" bindtap="startPush">
-            mock unpub
-          </button>
-        </view>
-      </scroll-view>
-    </view> -->
-    <view class="container bottom">
-      <view class="container row">
-        <view class="item col-2">
-          <button bind:tap="toggleMic" class="{{mic ? 'icon-mic' : 'icon-mic-off'}}">
-          </button>
-        </view>
-        <view class="item col-2">
-          <button bind:tap="toggleVolume" class="{{volume ? 'icon-volume-up' : 'icon-volume-off'}}">
-          </button>
-        </view>
-        <view class="item col-2">
-          <button bind:tap="onPhoneTab" class="icon-phone">
-          </button>
-        </view>
-        <view class="item col-2">
-          <button bind:tap="toggleBeauty" class="icon">
-          <!-- <button bind:tap="toggleCamera" class="icon"> -->
-            <image
-              src="{{beauty ? '../../assets/icons/face_beauty_open.png' : '../../assets/icons/face_beauty_close.png'}}"
-              mode="aspectFit"
-              lazy-load="false"
-              style="{{beauty ? 'width: 48px;height: 48px;': 'width: 30px;height: 48px;'}}"
-            >
-            </image>
-          </button>
-        </view>
-        <view class="item col-2">
-          <button bind:tap="switchCamera" class="icon">
-            <image src="../../assets/icons/camera_switch_end.png" mode="aspectFit" lazy-load="false" binderror="" bindload="">
-            </image>
-          </button>
-        </view>
-      </view>
+    </picker>
+  </view>
+  <view class="screen-model" wx:if="{{model}}" bindtap="closeModel">
+    <view class="screen-model-wrap" >
+      <slider class="screen-model-inner" wx:if="{{modelType === 'beauty'}}" max="9" show-value value="{{beauty}}" bindchanging="toggleBeauty" />
+      <slider class="screen-model-inner" wx:if="{{modelType === 'whiteness'}}" max="9" show-value value="{{whiteness}}" bindchanging="toggleWhiteness" />
+    </view>
+  </view>
+  <comment show="{{mergeModal}}" bindclose="handleCloseMergeList" bindinitRemoteTrack="handleInitRemoteTrack" remoteTracks="{{remoteTracks}}" rtmpUrl="{{rtmpUrl}}"></comment>
+  <chat show="{{chatModal}}" bindclose="handleCloseChat" userList="{{userList}}" messageList="{{messageList}}"></chat>
+  <view class="screen-footer">
+    <view class="flex justify-center">
+      <button bind:tap="toggleMic" class="sceen-icon {{mic ? 'screen-icon-mic' : 'screen-icon-mic-off'}}"></button>
+      <button bind:tap="onPhoneTab" class="sceen-icon screen-icon-phone"></button>
+      <button bind:tap="toggleVolume" class="sceen-icon {{volume ? 'screen-icon-volume-up' : 'screen-icon-volume-off'}}"></button>
+      <button bind:tap="switchCamera" class="sceen-icon screen-icon-camera-switc-end"></button>
     </view>
   </view>
 </view>

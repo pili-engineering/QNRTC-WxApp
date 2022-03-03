@@ -1,580 +1,563 @@
-import { RoomSession, log } from 'pili-rtc-wxapp'
-import { verifyRoomId, verifyUserId } from '../../common/utils'
-import { getToken } from '../../common/api'
+import { verifyRoomId, verifyUserId, debounce } from "../../common/utils";
+import { getToken } from "../../common/api";
+import QNRTC, { QNLocalTrack } from "qnwxapp-rtc";
 
-// eslint-disable-next-line no-undef
-const app = getApp()
+const app = getApp();
 Page({
   data: {
-    token: '',
-    playerId: '',
-    session: null,
+    rtmpUrl: "",
+    chatModal: false,
+    mergeModal: false,
+    directLiveStatus: false,
+    token: "",
+    playerId: "",
+    client: null,
     pushContext: null,
     mic: true,
     volume: true,
     camera: true,
     beauty: 0,
+    whiteness: 0,
+    mirror: false,
+    audioRevebList: ["关闭", "KTV", "小房间", "大会堂", "低沉", "洪亮", "金属声", "磁性"], 
+    audioReveb: 0,
+    filterList: [
+    {
+      zh: "标准",
+      en: "standard",
+    },
+    {
+      zh: "粉嫩",
+      en: "pink",
+    },
+    {
+      zh: "怀旧",
+      en: "nostalgia",
+    },
+    {
+      zh: "蓝调",
+      en: "blues",
+    },
+    {
+      zh: "浪漫",
+      en: "romantic",
+    },
+    {
+      zh: "清凉",
+      en: "cool",
+    },
+    {
+      zh: "清新",
+      en: "fresher",
+    },
+    {
+      zh: "日系",
+      en: "solor",
+    },
+    {
+      zh: "唯美",
+      en: "aestheticism",
+    },
+    {
+      zh: "美白",
+      en: "whitening",
+    },
+    {
+      zh: "樱红",
+      en: "cerisered",
+    }],
+    filter: 0,
+    filterResult: "standard",
     publishPath: undefined,
     subscribeList: [],
     remoteTracks: [],
-    debug: false,
+    userList: [],
+    messageList: [],
     isShowToast: false,
-    createMergeJob: {
-      id: null,
-      width: 720,
-      height: 1280,
-      stretchMode: 'aspectFill',
-      publishUrl: 'rtmp://123.59.184.113:1935/jztest11/merge_test_job?domain=pili-publish.jztest11.test.cloudvdn.com',
-      subscribeUrl: 'rtmp://123.59.184.113:1935/jztest11/merge_test_job?domain=pili-live-rtmp.jztest11.test.cloudvdn.com'
-    },
-    updateMergeTracks: {
-      id: null,
-      trackid: '4444444',
-      x: 100,
-      y: 0,
-      z: 0,
-      w: 240,
-      h: 160,
-      stretchMode: 'aspectFill'
-    },
-    stopMerge: {
-      id: null
-    },
-    sendMessage: {
-      userid: '',
-      text: 'haha'
-    },
-    merge: {
-      trackid: null,
-      step: 'createMergeJob',
-      stepOptions: ['createMergeJob', 'updateMergeTracks', 'stopMerge'],
-      stretchModeOptions: ['aspectFill', 'aspectFit', 'scaleToFit']
-    }
+    modelType: "",
+    model: false
   },
   onLoad(query) {
-    console.log(query)
-    const appid = query.appid || app.appid
-    const userid = query.userId || wx.getStorageSync('userId')
-    const room = query.room
-    this.pushContext = wx.createLivePusherContext()
-    this.setData({ pushContext: this.pushContext })
+    console.log(query);
+    const appid = query.appid || app.appid;
+    const userid = query.userId || wx.getStorageSync("userId");
+    const room = query.room;
+    this.pushContext = wx.createLivePusherContext();
+    this.setData({ pushContext: this.pushContext });
     wx.showToast({
-      title: '加入房间中',
-      icon: 'loading',
+      title: "加入房间中",
+      icon: "loading",
       mask: true,
-      fail: data => console.log('fail', data)
-    })
+      fail: (data) => console.log("fail", data),
+    });
     if (app.roomToken) {
-      this.initRoomWithToken(app.roomToken)
-      return
+      this.initRoomWithToken(app.roomToken);
+      return;
     }
     if (!verifyUserId(userid)) {
       wx.redirectTo({
-        url: '/pages/index/index',
+        url: "/pages/index/index",
         success: () => {
           wx.hideToast({
             fail: () => {
-              console.log('消息隐藏失败')
-            }
-          })
+              console.log("消息隐藏失败");
+            },
+          });
           wx.showToast({
-            title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
-            icon: 'none',
+            title: "用户名最少 3 个字符，并且只能包含字母、数字或下划线",
+            icon: "none",
             duration: 2000,
-            fail: data => console.log('fail', data)
-          })
-        }
-      })
+            fail: (data) => console.log("fail", data),
+          });
+        },
+      });
       return;
     }
     if (!verifyRoomId(room)) {
       wx.redirectTo({
-        url: '/pages/index/index',
+        url: "/pages/index/index",
         success: () => {
           wx.hideToast({
-            fail: () =>{
-              console.log('消息隐藏失败')
-            }
-          })
+            fail: () => {
+              console.log("消息隐藏失败");
+            },
+          });
           wx.showToast({
-            title: '房间名最少 3 个字符，并且只能包含字母、数字或下划线',
-            icon: 'none',
+            title: "房间名最少 3 个字符，并且只能包含字母、数字或下划线",
+            icon: "none",
             duration: 2000,
-            fail: data => console.log('fail', data)
-          })
-        }
-      })
+            fail: (data) => console.log("fail", data),
+          });
+        },
+      });
       return;
     }
-    this.appid = appid
-    this.roomName = room
-    this.userid = userid
-    this.setData({ playerId: userid })
-    this.initRoom(appid, room, userid, app.url)
+    this.appid = appid;
+    this.roomName = room;
+    this.userid = userid;
+    this.setData({ playerId: userid });
+    this.initRoom(appid, room, userid, app.url);
   },
   onShow() {
     // 保持屏幕常亮
     wx.setKeepScreenOn({
       keepScreenOn: true,
-      fail: () => {console.log('保持常亮状态失败')}
-    })
-    console.log('onShow' + Date.now().valueOf())
+      fail: () => console.log("保持常亮状态失败"),
+    });
+    console.log("onShow" + Date.now().valueOf());
     // onShow 中直接调用 play 无效
   },
-  toggleDebug() {
-    this.setData({ debug: !this.data.debug })
-  },
-  handleMergeOptionsChange(e) {
-    const name = e.target.dataset.name
-    const merge = this.data.merge
-    merge.step = name
-    this.setData({ merge })
-  },
-  handleMergeInput(group, key, value) {
-    const mergeData = this.data[group]
-    mergeData[key] = value
-    this.setData({ [group]: mergeData })
-    console.log('merge input:', group, key, value)
-  },
-  handleCreateMergeJobInput(e) {
-    const name = e.target.dataset.key
-    const type = e.target.dataset.type
-    const value = type === 'number' ? Number(e.detail.value) : e.detail.value
-    this.handleMergeInput('createMergeJob', name, value)
-  },
-  handleCreateMergeJobStretchMode(e) {
-    const idx = e.detail.value
-    const value = this.data.merge.stretchModeOptions[idx]
-    this.handleMergeInput('createMergeJob', 'stretchMode', value)
-  },
-  handleUpdateMergeTracksInput(e) {
-    const name = e.target.dataset.key
-    const type = e.target.dataset.type
-    const value = type === 'number' ? Number(e.detail.value) : e.detail.value
-    this.handleMergeInput('updateMergeTracks', name, value)
-  },
-  handleUpdateMergeTracksIdChange(e) {
-    const idx = e.detail.value
-    const value = this.data.remoteTracks[idx]
-    this.handleMergeInput('updateMergeTracks', 'trackid', value)
-  },
-  handleUpdateMergeJobStretchMode(e) {
-    const idx = e.detail.value
-    const value = this.data.merge.stretchModeOptions[idx]
-    this.handleMergeInput('updateMergeTracks', 'stretchMode', value)
-  },
-  handleStopMergeInput(e) {
-    const name = e.target.dataset.key
-    const type = e.target.dataset.type
-    const value = type === 'number' ? Number(e.detail.value) : e.detail.value
-    this.handleMergeInput('stopMerge', name, value)
-  },
-  handleSendMessageInput(e) {
-    const name = e.target.dataset.key
-    const value = e.detail.value
-    this.handleMergeInput('sendMessage', name, value)
-  },
-  createMergeJob() {
-    const createMergeJob = this.data.createMergeJob
-    const session = this.data.session
-    if (createMergeJob.id == null) {
-      return
-    }
-    session.createMergeJob(createMergeJob.id, createMergeJob)
-  },
-  addMergeTracks() {
-    const { updateMergeTracks, session } = this.data
-    if (updateMergeTracks.id == null) {
-      return
-    }
-    const allTracks = []
-    allTracks.push(Object.assign({}, updateMergeTracks, { trackid: updateMergeTracks.trackid }))
-    // const tracks = (session.tracks || []).concat(session.localTracks)
-    // const allTracks = tracks.map((track, idx) => {
-    //   return Object.assign({}, updateMergeTracks, { trackid: track.trackid, y: updateMergeTracks.y + 150 * idx })
-    // })
-    console.log('allTracks', allTracks)
-    session.addMergeTracks(allTracks, updateMergeTracks.id)
-  },
-  removeMergeTracks() {
-    const { updateMergeTracks, session } = this.data
-    if (updateMergeTracks.id == null) {
-      return
-    }
-    session.removeMergeTracks([updateMergeTracks], updateMergeTracks.id)
-  },
-  stopMerge() {
-    const { stopMerge, session } = this.data
-    if (stopMerge.id == null) {
-      return
-    }
-    session.stopMerge(stopMerge.id)
-  },
-  sendMessage() {
-    const { sendMessage, session } = this.data
-    if (sendMessage.userid == null) {
-      return
-    }
-    session.sendMessage([sendMessage.userid], sendMessage.text)
-  },
+
   livePusherError(e) {
     if (Number(e.code) < 0) {
-      wx.showToast({ title: '发布失败' ,fail: data => console.log('fail', data)})
+      wx.showToast({
+        title: "发布失败",
+        fail: (data) => console.log("fail", data),
+      });
     }
-    console.error('live-pusher error:', e.detail.code, e.detail.errMsg)
+    console.error("live-pusher error:", e.detail.code, e.detail.errMsg);
   },
   livePlayerError(e) {
-    console.error('live-player error:', e.detail.code, e.detail.errMsg)
+    console.error("live-player error:", e.detail.code, e.detail.errMsg);
   },
-  joinRoom(roomToken, url) {
-    if (app.islog === false) {
-      log.setLevel('disable')
-    }
-    let session
-    if (url) {
-      session = new RoomSession({
-        server: url,
-      })
-    } else {
-      session = new RoomSession()
-    }
-    this.handleEvent(session)
-    this.setData({ session })
-    const starttime = Date.now().valueOf()
-    console.log(`[${starttime}] joinRoomWithToken: ${roomToken}`)
-    session.joinRoomWithToken(roomToken, JSON.stringify({
-      name: '测试'
-    }))
-      .then(() => {
-        console.log('进入房间成功')
-        const endtime = Date.now().valueOf()
-        console.log(`[${endtime}] +${endtime - starttime}ms joinRoom success`)
-        const path = session.publish()
-        console.log('pubpath: ' + path)
-        const remoteTracks = (session.tracks || []).map(track => track.trackid)
+  async joinRoom(roomToken, url) {
+    this.setData({
+      userList: [],
+      remoteTracks: [],
+      messageList: [],
+      subscribeList: []
+    })
+    const client = QNRTC.createClient();
+    app.globalData.client = client;
+    this.handleEvent(client);
+    await client.join(roomToken, "测试");
+    this.setData({
+      client,
+      rtmpUrl: `rtmp://pili-publish.qnsdk.com/sdk-live/${client.appId}_${client.roomName}_${client.userId}_test`,
+    });
+    client.publish((status, data) => {
+      console.log("callback: publish - 发布后回调",status, data);
+      if (status === "READY") {
         this.setData({
-          publishPath: path,
-          remoteTracks
-        }, () => {
-          this.startPush()
+          publishPath: data.url,
+        });
+      } else if (status === "COMPLATED") {
+        console.log("local-track-add", data.tracks);
+        const remoteTracks = [...data.tracks];
+        remoteTracks.forEach(item => {
+          item.isLocal = true;
+          item.h = 100;
+          item.w = 100;
+          item.x = 0;
+          item.y = 0;
+          item.z = 0;
+          item.stretchMode = 0;
         })
-        console.log('session:', session)
-        session.users
-          .filter(v => v.playerid !== session.userId)
-          .forEach(v => {
-            this.subscribe(v.playerid)
-          })
-          wx.hideToast({
-            fail: () => {
-              console.log('消息隐藏失败')
-            }
-          })
-      })
-      .catch(err => {
-        console.log('加入房间失败', err)
-        wx.reLaunch({
-          url: '/pages/index/index',
-          success: () => {
-            wx.showToast({
-              title: '加入房间失败',
-              icon: 'none',
-              fail: data => console.log('fail', data)
-            })
-          }
-        })
-      })
+        this.setData({
+          remoteTracks: [...this.data.remoteTracks, ...remoteTracks],
+        });
+      }
+    });
   },
   leaveRoom() {
-    const { session } = this.data
-    console.log('leaveRoom`s session:',session)
-    return session.leaveRoom({ code: 0 })
-  },
-  // subscribe(playerid) {
-  //   const { subscribeList, session } = this.data
-  //   console.log('session:',session)
-  //   if (subscribeList.length === 9) {
-  //     return wx.showToast({ title: '最多订阅9个', icon: 'none' })
-  //   }
-  //   const path = session.subscribe(playerid)
-  //   console.log('subpath: ' + path)
-  //   if (path) {
-  //     const sub = subscribeList.filter(v => v.key !== playerid)
-  //     sub.push({
-  //       url: path,
-  //       key: playerid,
-  //     })
-  //     this.setData({
-  //       subscribeList: sub,
-  //     }, () => {
-  //       console.log('subscribeList:', this.data.subscribeList)
-  //     })
-  //   }
-  // },
-  subscribe(playerid) {
-    const { subscribeList, session } = this.data
-    console.log('session:', session)
-    const addressList = session.getSubscribeAddressList(playerid)
-    console.log('AddressList: ', addressList)
-    if (addressList) {
-      if (subscribeList.length + addressList.length > 9) {
-        return wx.showToast({ title: '最多订阅9条流', icon: 'none' ,fail: data => console.log('fail', data)})
-      }
-      const sub = subscribeList.filter(v => v.userid !== playerid)
-      const urlList = []
-      addressList.map(((item, index)=> {
-        urlList.push(Object.assign({}, item, {
-          key:playerid + Math.random().toString(36).slice(-8),
-          userid:playerid
-        }))
-      }))
-      urlList.forEach(e => {
-        sub.push(e)
-      })
-      this.setData({
-        subscribeList: sub,
-      }, () => {
-        console.log('subscribeList:', this.data.subscribeList)
-      })
-    }
-  },
-  startPush() {
+    const { client } = this.data;
+    console.log("leaveRoom`s client:", client);
+    client.leave()
   },
   onHide() {
     wx.setKeepScreenOn({
       keepScreenOn: false,
-      fail: () => {console.log('保持常亮状态失败')}
-    })
-    console.log('onHide')
+      fail: () => console.log("保持常亮状态失败"),
+    });
+    console.log("onHide");
   },
   onUnload() {
-    console.log('onUnload')
-    this.leaveRoom()
+    console.log("onUnload");
+    this.leaveRoom();
   },
   toggleMic() {
-    this.setData({ mic: !this.data.mic })
-    const { session } = this.data
-    const mic = this.data.mic
-    console.log('mic', mic)
-    if (session.localTracks.length === 0) {
-      return
+    this.setData({ mic: !this.data.mic });
+    const { client } = this.data;
+    const mic = this.data.mic;
+    const index = client.localTracks.findIndex((item) => item.isAudio() && item.isLocal);
+    if (index >= 0) {
+      client.localTracks[index].setMuted(!mic);
     }
-    const tracks = session.localTracks.filter(t => t.kind === 'audio').map(ele => ({trackid: ele.trackid, muted: !mic}))
-    session.muteTracks(tracks)
   },
   toggleVolume() {
-    this.setData({ volume: !this.data.volume })
+    this.setData({ volume: !this.data.volume });
   },
   toggleCamera() {
-    this.setData({ camera: !this.data.camera })
-    const { session } = this.data
-    const camera = this.data.camera
-    console.log('camera', camera)
-    if (session.localTracks.length === 0) {
-      return
+    this.setData({ camera: !this.data.camera });
+    const { client } = this.data;
+    const camera = this.data.camera;
+    const index = client.localTracks.findIndex((item) => item.isVideo() && item.isLocal);
+    if (index >= 0) {
+      client.localTracks[index].setMuted(!mic);
     }
-    const tracks = session.localTracks.filter(t => t.kind === 'video').map(ele => ({trackid: ele.trackid, muted: !camera}))
-    session.muteTracks(tracks)
   },
-  toggleBeauty() {
-    this.setData({ beauty: this.data.beauty ? 0 : 9 })
+  closeModel() {
+    this.setData({
+      model: false,
+      modelType: ""
+    })
   },
+  openBeauty() {
+    this.setData({
+      model: true,
+      modelType: "beauty"
+    })
+  },
+  toggleBeauty(event) {
+    this.setData({ beauty: event.detail.value });
+  },
+  openWhiteness() {
+    this.setData({
+      model: true,
+      modelType: "whiteness"
+    })
+  },
+  toggleWhiteness(event) {
+    this.setData({ whiteness: event.detail.value });
+  },
+  toggleMirror() {
+    this.setData({
+      mirror: !this.data.mirror
+    })
+  },
+  toggleAudioReveb(event) {
+    this.setData({
+      audioReveb: event.detail.value
+    })
+  },
+  toggleFilter(event) {
+    this.setData({
+      filter: event.detail.value,
+      filterResult: this.data.filterList[event.detail.value].en
+    })
+  },
+  // 离开房间
   onPhoneTab() {
     // leave room
-    this.leaveRoom()
-    wx.navigateBack({ delta: 1 })
+    this.leaveRoom();
+    wx.navigateBack({ delta: 1 });
   },
+  // 切换摄像头
   switchCamera() {
-    const { pushContext } = this.data
+    const { pushContext } = this.data;
     if (pushContext) {
-      pushContext.switchCamera()
+      pushContext.switchCamera();
     }
   },
 
   initRoom(appid, room, userid, url) {
-    console.log('url:', url)
-    return getToken(appid, room, userid)
-      .then(token => {
-        app.url = url
-        return this.joinRoom(token, url)
-      })
+    console.log("url:", url);
+    return getToken(appid, room, userid).then((token) => {
+      const app = getApp();
+      app.url = url;
+      return this.joinRoom(token, url);
+    });
   },
   initRoomWithToken(roomToken, url) {
-    return this.joinRoom(roomToken, url)
+    return this.joinRoom(roomToken, url);
   },
-  handleEvent(session) {
-    session.on('track-add', (tracks) => {
-      console.log('track-add', tracks)
-      const remoteTracks = this.data.remoteTracks
-      const set = {}
-      for (const track of tracks) {
-        remoteTracks.push(track.trackid)
-        // 每个 playerid 只订阅一次
-        if (!set[track.playerid]) {
-          set[track.playerid] = true
-          this.subscribe(track.playerid)
-        }
+  handleStartDirectLiveStreaming: debounce(async function () {
+    if(this.data.directLiveStatus) {
+      this.handleCloseDirectLiveStreaming();
+      return;
+    }
+    const { client } = this.data;
+    if (client === null) {
+      wx.showToast({
+        title: "client未初始化",
+        icon: "none",
+        duration: 500,
+      });
+      return false;
+    }
+    try {
+      await client.startDirectLiveStreaming({
+        videoTrack: this.data.remoteTracks.find((item) => item.isVideo() && item.isLocal),
+        audioTrack: this.data.remoteTracks.find((item) => item.isAudio() && item.isLocal),
+        streamID: "default",
+        url: this.data.rtmpUrl,
+      });
+      wx.showToast({
+        title: "创建单路转推成功",
+        icon: "none",
+        duration: 500,
+      });
+      this.setData({
+        directLiveStatus: true,
+      });
+    } catch (e) {
+      console.log(e);
+      wx.showToast({
+        title: e.message,
+        icon: "none",
+        duration: 500,
+      });
+    }
+  }),
+  handleCloseDirectLiveStreaming: debounce(async function () {
+    const { client } = this.data;
+    if (client === null) {
+      wx.showToast({
+        title: "client未初始化",
+        icon: "none",
+        duration: 500,
+      });
+      return false;
+    }
+    try {
+      const result = await client.stopDirectLiveStreaming("default");
+      this.setData({
+        directLiveStatus: false,
+      });
+      wx.showToast({
+        title: "停止单路转推成功",
+        icon: "none",
+        duration: 500,
+      });
+    } catch (e) {
+      console.log(e);
+      wx.showToast({
+        title: e.message,
+        icon: "none",
+        duration: 500,
+      });
+    }
+  }),
+  handleEvent(client) {
+    client.on("user-joined", (user, userData) => {
+      console.log("event: user-joined - 用户加入房间", user, userData);
+      this.setData({
+        userList: [...this.data.userList, { playerid: user }],
+      });
+    });
+    client.on("user-left", (user) => {
+      console.log("event: user-left - 用户离开房间", user);
+      this.setData({
+        subscribeList: this.data.subscribeList.filter((v) => v.userID !== user),
+        userList: this.data.userList.filter((v) => v.playerid !== user),
+      });
+      console.log("user-leave`subscribeList:", this.data.subscribeList);
+    });
+    client.on("user-published", async (user, tracks) => {
+      console.log("event: user-published - 用户发布", user, tracks);
+      if (user === this.data.playerId) {
+        return false;
       }
-      this.setData({ remoteTracks })
-    })
-    session.on('track-remove', (tracks) => {
-      console.log('track-remove', tracks)
-      const {remoteTracks, subscribeList} = this.data
+      let remoteTracks = [...tracks]
+      remoteTracks.forEach(item => {
+        item.h = 100;
+        item.w = 100;
+        item.x = 0;
+        item.y = 0;
+        item.z = 0;
+        item.stretchMode = 0;
+      })
+      this.setData({ remoteTracks: [...this.data.remoteTracks, ...remoteTracks] });
+      if (this.data.subscribeList.find((item) => item.userID === user)) {
+        return false;
+      }
+      let config = {};
+      let videoTrack = tracks.find((item) => item.isVideo());
+      let audioTrack = tracks.find((item) => item.isAudio());
+      if (videoTrack) {
+        config.videoTrack = videoTrack;
+      }
+      if (audioTrack) {
+        config.audioTrack = audioTrack;
+      }
+      const url = await client.subscribe(config);
+      this.setData({
+        subscribeList: [
+          ...this.data.subscribeList,
+          {
+            url,
+            key: user + Math.random().toString(36).slice(-8),
+            userID: user,
+          },
+        ],
+      });
+    });
+    client.on("user-unpublished", (user, tracks) => {
+      console.log("event: user-unpublished - 用户取消发布", user, tracks);
+      const { remoteTracks, subscribeList } = this.data;
       for (const track of tracks) {
-        const idx = remoteTracks.indexOf(track.trackid)
+        const idx = remoteTracks.findIndex(
+          (item) => item.trackID === track.trackID
+        );
         if (idx !== -1) {
-          remoteTracks.splice(idx, 1)
+          remoteTracks.splice(idx, 1);
         }
         subscribeList.map((ele, index) => {
-          if (ele.url.indexOf(track.trackid) !== -1) {
-            return subscribeList.splice(index, 1)
+          if (ele.url.indexOf(track.trackID) !== -1) {
+            return subscribeList.splice(index, 1);
           }
-        })
+        });
       }
-      this.setData({ remoteTracks, subscribeList })
-      console.log('track-remove-data', this.data)
-    })
-    session.on('user-leave', (user) => {
-      console.log('user-leave', user)
-      console.log('leave subscribeList', this.data.subscribeList)
+      this.setData({ remoteTracks, subscribeList });
+    });
+    client.on("connection-state-changed", (state, info) => {
+      console.log("event: connection-state-changed - 用户连接状态发生改变", state, info);
+      if (state === "DISCONNECTED" && info.reason === "ERROR") {
+        this.reconnect();
+      }
+    });
+    client.on("message-received", (message) => {
+      console.log("event: message-received - 用户接收消息", message);
       this.setData({
-        subscribeList: this.data.subscribeList.filter(v => v.userid !== user.playerid),
-      })
-      console.log('user-leave`subscribeList:', this.data.subscribeList)
-    })
-    session.on('user-join', (user) => {
-      console.log('user-join', user)
-    })
-    session.on('local-track-add', (tracks) => {
-      const remoteTracks = this.data.remoteTracks
-      console.log('local-track-add', tracks)
-      for (const track of tracks) {
-        remoteTracks.push(track.trackid)
-        // 每个 playerid 只订阅一次
-      }
-      this.setData({ remoteTracks })
-    })
-    session.on('local-track-remove', (tracks) => {
-      const remoteTracks = this.data.remoteTracks
-      console.log('local-track-remove', tracks)
-      for (const track of tracks) {
-        const idx = remoteTracks.indexOf(track.trackid)
-        if (idx !== -1) {
-          remoteTracks.splice(idx, 1)
-        }
-      }
-      this.setData({ remoteTracks })
-    })
-    session.on('disconnect', (res) => {
-      let title = '已离开房间'
-      if (res.code === 10006) {
-        title = '被踢出房间'
-      }
-      wx.reLaunch({
-        url: '/pages/index/index',
-        success: () => {
-          wx.showToast({
-            title,
-            icon: 'none',
-            fail: data => console.log('fail', data)
-          })
-        },
-      })
-    })
-    session.on('error', (res) => {
-      console.log('session error', res)
-      this.reconnect()
-    })
-    session.on('reconnecting', () => {
-      console.log('尝试重连中...')
-      wx.showToast({
-        title: '尝试重连中...',
-        icon: 'loading',
-        mask: true,
-        fail: data => console.log('fail', data)
-      })
-    })
-    session.on('reconnected', () => {
-      this.startPush()
-      for (const track of this.data.subscribeList) {
-        const ctx = wx.createLivePlayerContext(track.key)
-        if (ctx) {
-          ctx.play()
-        }
-      }
-      wx.hideToast({
-        fail: () => {
-          console.log('消息隐藏失败')
-        }
-      })
-    })
-    session.on('mute-tracks', (tracks) => {
-      console.log('mute-tracks', tracks)
-    })
+        messageList: [...this.data.messageList, message],
+      });
+    });
   },
   handlePusherStateChange(e) {
-    console.log('pusher state', e.detail.code, e.detail.message)
+    console.log("pusher state", e.detail.code, e.detail.message);
   },
   handlerPusherNetStatus(e) {
-    console.log('pusher net status', 'videoBitrate: ', e.detail.info.videoBitrate, 'audioBitrate: ', e.detail.info.audioBitrate)
+    console.log(
+      "pusher net status",
+      "videoBitrate: ",
+      e.detail.info.videoBitrate,
+      "audioBitrate: ",
+      e.detail.info.audioBitrate
+    );
   },
   handlePlayerStateChange(e) {
-    console.log('player state', e.detail.code, e.detail.message)
+    console.log("player state", e.detail.code, e.detail.message);
   },
   handlePlayerNetStatus(e) {
-    console.log('player net status', 'videoBitrate: ', e.detail.info.videoBitrate, 'audioBitrate: ', e.detail.info.audioBitrate)
+    console.log(
+      "player net status",
+      "videoBitrate: ",
+      e.detail.info,
+      "audioBitrate: ",
+      e.detail.info.audioBitrate
+    );
+  },
+  handleOpenMergeList() {
+    this.setData({
+      mergeModal: true,
+    });
+  },
+  handleCloseMergeList() {
+    this.setData({
+      mergeModal: false,
+    });
+  },
+  handleOpenChat() {
+    this.setData({
+      chatModal: true,
+    });
+  },
+  handleCloseChat() {
+    this.setData({
+      chatModal: false,
+    });
+  },
+  handleInitRemoteTrack() {
+    this.setData({
+      remoteTracks: this.data.remoteTracks,
+    });
   },
   reconnect() {
-    console.log('尝试重连中...')
+    console.log("尝试重连中...");
     wx.showToast({
-      title: '尝试重连中...',
-      icon: 'loading',
+      title: "尝试重连中...",
+      icon: "loading",
       mask: true,
-      fail: data => console.log('fail', data)
-    })
-    this.leaveRoom()
+      fail: (data) => console.log("fail", data),
+    });
     this.setData({
-      publishPath: '',
+      publishPath: "",
       subscribeList: [],
-    })
-    const { pushContext } = this.data
+    });
+    const { pushContext } = this.data;
     if (pushContext) {
-      pushContext.stop()
+      pushContext.stop();
     }
     this.reconnectTimer = setTimeout(() => {
+      const app = getApp();
       if (app.roomToken) {
-        this.initRoomWithToken(app.roomToken, app.url).then(() => {
-          wx.hideToast({
-            fail: () => {
-              console.log('消息隐藏失败')
-            }
+        this.initRoomWithToken(app.roomToken, app.url)
+          .then(() => {
+            wx.hideToast({
+              fail: () => {
+                console.log("消息隐藏失败");
+              },
+            });
           })
-        }).catch(e => {
-          console.log(`reconnect failed: ${e}`)
-          return this.reconnect()
-        })
+          .catch((e) => {
+            console.log(`reconnect failed: ${e}`);
+            return this.reconnect();
+          });
       } else if (this.appid && this.roomName && this.userid) {
-        this.initRoom(this.appid, this.roomName, this.userid, app.url).then(() => {
-          wx.hideToast({
-            fail: () => {
-              console.log('消息隐藏失败')
-            }
+        this.initRoom(this.appid, this.roomName, this.userid, app.url)
+          .then(() => {
+            wx.hideToast({
+              fail: () => {
+                console.log("消息隐藏失败");
+              },
+            });
           })
-        }).catch(e => {
-          console.log(`reconnect failed: ${e}`)
-          return this.reconnect()
-        })
+          .catch((e) => {
+            console.log(`reconnect failed: ${e}`);
+            return this.reconnect();
+          });
       } else {
         wx.reLaunch({
-          url: '/pages/index/index',
+          url: "/pages/index/index",
           success: () => {
             wx.showToast({
-              title: '加入房间失败',
-              icon: 'none',
-              fail: data => console.log('fail', data)
-            })
-          }
-        })
+              title: "加入房间失败",
+              icon: "none",
+              fail: (data) => console.log("fail", data),
+            });
+          },
+        });
       }
-    }, 1000)
-  }
-})
+    }, 1000);
+  },
+});
