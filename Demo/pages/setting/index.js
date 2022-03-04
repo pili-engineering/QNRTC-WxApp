@@ -1,31 +1,30 @@
 import { verifyUserId } from '../../common/utils'
 
-// eslint-disable-next-line no-undef
-const app = getApp()
 Page({
   data: {
     appid: '',
     userId: '',
     url: '',
-    islog: false
   },
-  onShow() {
-    const islog = app.islog
-    this.setData({ islog })
+  onLoad() {
+    const app = getApp()
+    this.setData({
+      appid: app.appid ? app.appid : '',
+      url: app.url ? app.url : '',
+      userId: wx.getStorageSync('userId') ? wx.getStorageSync('userId') : ''
+    })
   },
-  onSwitchLog(e) {
-    this.setData({ islog: e.detail.value })
-  },
-  onUserIdInput(e) {
+  onUserIdInput: function(e) {
     this.setData({ userId: e.detail.value })
   },
-  onAppidInput(e) {
+  onAppidInput: function(e) {
     this.setData({ appid: e.detail.value })
   },
-  onUrlInput(e) {
+  onUrlInput: function(e) {
     this.setData({ url: e.detail.value })
   },
   onSubmit() {
+    const app = getApp()
     const value = this.data
     if (value.appid) {
       app.appid = value.appid
@@ -34,8 +33,6 @@ Page({
     if (value.url) {
       app.url = value.url
     }
-
-    app.islog = value.islog
 
     if (verifyUserId(value.userId)) {
       wx.setStorageSync('userId', value.userId)

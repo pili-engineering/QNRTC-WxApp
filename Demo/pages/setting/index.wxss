@@ -25,10 +25,7 @@ button.plain.button-hover {
   background-color: rgba(52, 170, 220, 0.808);
 }
 
-.switchItem{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.input {
   margin-top: 24rpx;
   padding-left: 1.5em;
   line-height: 45px;

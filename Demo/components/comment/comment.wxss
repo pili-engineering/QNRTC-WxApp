@@ -1,0 +1,90 @@
+.comment{
+    background:#f1f1f1;
+    position: fixed;
+    bottom:0;
+    box-sizing: border-box;
+    left:0;
+    width:100vw;
+    min-height:100rpx;
+    height:auto;
+    z-index: 100000;
+    display:flex;
+    flex-direction: column;
+    max-height:100vh;
+    transition: all .3s
+}
+
+.comment-modal{
+    position: fixed;
+    top:0;
+    left:0;
+    height:100vh;
+    width:100vw;
+    background:rgba(0,0,0,0.2)
+}
+
+.comment-hide{
+    min-height:0;
+    box-sizing: content-box;
+    padding-bottom:0;
+    overflow: hidden;
+}
+
+.comment-show{
+    box-sizing: border-box;
+}
+
+
+.comment-item{
+    background:white;
+    padding: 30rpx 0;
+    position: relative;
+}
+
+.comment-btn{
+    position: absolute;
+    right:10rpx;
+    top:-30rpx
+}
+
+.comment-title{
+    color: #8799a3;
+    font-size: 30rpx;
+    line-height: 65rpx;
+    font-weight: bold;
+}
+
+.comment-tag {
+    width: 100%;
+    color: #8799a3;
+    font-size: 30rpx;
+    padding: 0 20rpx;
+    height:100rpx;
+    line-height:100rpx;
+}
+
+.comment-submit-merge{
+    width:100%;
+    height:100rpx;
+    border-radius: 0;
+    line-height:100rpx;
+    box-sizing: content-box;
+}
+
+.comment-submit-merge-ipx{
+    padding-bottom:34px
+}
+
+.scrollView{
+    max-height:calc( 800rpx - 100rpx )
+}
+.ipxScrollView{
+    max-height:calc( 800rpx - 100rpx - 34px )
+}
+
+.ipxScrollTrack{
+    max-height:calc( 800rpx - 34px )
+}
+.scrollTrack{
+    max-height:800rpx
+}

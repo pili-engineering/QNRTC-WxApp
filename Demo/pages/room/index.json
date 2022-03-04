@@ -1,7 +1,9 @@
 {
-  "disableScroll": true,
-  "usingComponents": {
-    "player": "/miniprogram_npm/qiniu-wx-player/live-player/index",
-    "pusher": "/miniprogram_npm/qiniu-wx-player/live-pusher/index"
+    "disableScroll": true,
+    "usingComponents": {
+      "comment":"/components/comment/comment",
+      "chat": "/components/chat/chat",
+      "player": "/miniprogram_npm/qiniu-wx-player/live-player/index",
+      "pusher": "/miniprogram_npm/qiniu-wx-player/live-pusher/index"
+    }
   }
-}

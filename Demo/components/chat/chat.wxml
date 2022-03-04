@@ -1,0 +1,26 @@
+<view>
+    <view class="chat-modal" wx:if="{{show}}" bind:tap="handleCloseModal"></view>
+    <view class="chat {{show?'chat-show':'chat-hide'}}" style="height:{{show?height: '0'}}">
+        <view>
+            <scroll-view scroll-y class="bg-white {{isIPX?'chat-ipx-scroll-view':'chat-scroll-view'}}">
+                <view class="form-group" wx:for="{{messageList}}" wx:key="*this">
+                    <view class="title">{{item.userID}}： {{item.content}}</view>
+                </view>
+            </scroll-view>
+            <view class="bg-white box-shadow-top">
+                <picker mode="selector" value="{{selectUser}}" bindchange="onUserChange" range-key="playerid" range="{{userList}}">
+                    <view class="form-group font-size-30 color-normal">
+                        选择发送的userId：{{selectUser}}
+                    </view>
+                </picker>
+                <view class="form-group">
+                    <view class="title">发送内容</view>
+                    <input type="text" confirm-type="done" bindinput="onContentChange" value="{{content}}" />
+                </view>
+                <button class="{{isIPX?'chat-submit-merge-ipx':''}} text-center bg-normal chat-submit-merge" bindtap="handleSubmitMessage">
+                    发送
+                </button>
+            </view>
+        </view>
+    </view>
+</view>

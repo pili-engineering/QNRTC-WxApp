@@ -1,0 +1,196 @@
+<view>
+    <view class="comment-modal" wx:if="{{show}}" bind:tap="handleCloseModal"></view>
+    <view class="comment {{show?'comment-show':'comment-hide'}}" style="height:{{show?height: '0'}}">
+        <view hidden="{{jobStatus===1}}">
+            <scroll-view scroll-y class="{{isIPX?'ipxScrollView':'scrollView'}}">
+                <view class="comment-item">
+                    <view class="form-group">
+                        <view class="title">合流发布地址</view>
+                        <input type="text" disabled bindinput="onFormDataChange" data-key="mergeOption.publishUrl" value="{{mergeOption.publishUrl}}" />
+                    </view>
+                    <view class="form-group">
+                        <view class="title">合流id</view>
+                        <input type="text" confirm-type="done" disabled="{{jobStatus === 2}}" bindinput="onFormDataChange" data-key="mergeOption.id" value="{{mergeOption.id}}" />
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">最大码率</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.maxRate" value="{{mergeOption.maxRate}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">最低码率</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.minRate" value="{{mergeOption.minRate}}" />
+                        </view>
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">码率</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.kbps" value="{{mergeOption.kbps}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">帧率</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.fps" value="{{mergeOption.fps}}" />
+                        </view>
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">宽度</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.width" value="{{mergeOption.width}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">高度</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.height" value="{{mergeOption.height}}" />
+                        </view>
+                    </view>
+                    <picker mode="selector" value="{{mergeOption.stretchMode}}" bindchange="onFormDataChange" data-key="mergeOption.stretchMode" range="{{stretchModeList}}">
+                        <view class="form-group font-size-30 color-normal">
+                            选择画面填充方式：{{stretchModeList[mergeOption.stretchMode]}}
+                        </view>
+                    </picker>
+                    <view class="form-group ">
+                        <view class="title">holdLastFrame</view>
+                        <switch checked="{{mergeOption.holdLastFrame}}" data-key="mergeOption.holdLastFrame" bindchange="onFormDataChange"></switch>
+                    </view>
+                    <view class="form-group">
+                        <view class="title">audioOnly</view>
+                        <switch checked="{{mergeOption.audioOnly}}" data-key="mergeOption.audioOnly" bindchange="onFormDataChange"></switch>
+                    </view>
+                    <view class="flex margin-top-30">
+                        <button class="btn bg-normal margin-left-20" bindtap="handleAddWatermark">
+                            添加水印
+                        </button>
+                        <button class="btn bg-normal margin-left-20" bindtap="handleAddBackground">
+                            添加背景
+                        </button>
+                    </view>
+                </view>
+                <view class="comment-item margin-top-60" wx:if="{{showBackground}}">
+                    <button class="btn bg-danger comment-btn" bindtap="handleCloseBackground">
+                        删除背景
+                    </button>
+                    <view class="form-group">
+                        <view class="title">背景地址</view>
+                        <input type="text" confirm-type="done" bindinput="onFormDataChange" data-key="mergeOption.background.url" value="{{mergeOption.background.url}}" />
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">高度</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.background.h" value="{{mergeOption.background.h}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">宽度</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.background.w" value="{{mergeOption.background.w}}" />
+                        </view>
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">横轴偏移</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.background.x" value="{{mergeOption.background.x}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">纵轴偏移</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.background.y" value="{{mergeOption.background.y}}" />
+                        </view>
+                    </view>
+                </view>
+                <view class="comment-item margin-top-60" wx:for="{{mergeOption.watermarks}}" wx:key="*this">
+                    <button class="btn bg-danger comment-btn" bindtap="handleCloseWatermarks" data-index="{{index}}">
+                        删除水印
+                    </button>
+                    <view class="form-group">
+                        <view class="title">水印地址</view>
+                        <input type="text" confirm-type="done" bindinput="onFormDataChange" data-key="mergeOption.watermarks[{{index}}].url" value="{{mergeOption.watermarks[index].url}}" />
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">高度</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.watermarks[{{index}}].h" value="{{mergeOption.watermarks[index].h}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">宽度</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.watermarks[{{index}}].w" value="{{mergeOption.watermarks[index].w}}" />
+                        </view>
+                    </view>
+                    <view class="flex">
+                        <view class="form-group">
+                            <view class="title">横轴偏移</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.watermarks[{{index}}].x" value="{{mergeOption.watermarks[index].x}}" />
+                        </view>
+                        <view class="form-group">
+                            <view class="title">纵轴偏移</view>
+                            <input type="number" confirm-type="done" bindinput="onFormDataNumberChange" data-key="mergeOption.watermarks[{{index}}].y" value="{{mergeOption.watermarks[index].y}}" />
+                        </view>
+                    </view>
+                </view>
+            </scroll-view>
+            <button class="text-center comment-submit-merge bg-normal {{isIPX?'comment-submit-merge-ipx':''}}" bindtap="handleCreateMergeJob">
+                {{jobStatus === 0 ? '创建' : '编辑'}}合流
+            </button>
+        </view>
+        <view hidden="{{jobStatus!==1}}">
+            <view class="flex bg-white padding-20">
+                <text class="comment-title">track设置</text>
+                <button class="btn bg-warning margin-left-20" bindtap="handleEditMergeJob">
+                    编辑合流
+                </button>
+                <button class="btn bg-danger margin-left-20" bindtap="handleDeleteMergeJob">
+                    停止合流
+                </button>
+            </view>
+            <scroll-view scroll-y style="height:694rpx">
+                <view class="comment-item margin-top-60" wx:for="{{remoteTracks}}" wx:key="*this">
+                    <button class="btn bg-normal comment-btn" wx:if="{{!item.status}}" bindtap="handleAddMergeTracks" data-index="{{index}}">
+                        加入合流
+                    </button>
+                    <button class="btn bg-danger comment-btn" wx:if="{{item.status}}" bindtap="handleDeleteMergeTracks" data-index="{{index}}">
+                        移除轨道
+                    </button>
+                    <view>
+                        <view class="flex">
+                            <view class="comment-tag">
+                                轨道id：{{item._trackID}}
+                            </view>
+                        </view>
+                        <view class="flex">
+                            <view class="comment-tag">
+                                类型：{{item._kind === 'video' ? '视频轨' : '音频轨'}}
+                            </view>
+                            <view class="comment-tag">用户名：{{item._userID}}</view>
+                        </view>
+                    </view>
+                    <block wx:if="{{item._kind === 'video'}}">
+                        <view class="flex">
+                            <view class="form-group">
+                                <view class="title">高度</view>
+                                <input type="number" confirm-type="done" bindinput="onRemoteTrackNumberChange" data-index="{{index}}" data-key="remoteTracks[{{index}}].h" value="{{item.h}}" />
+                            </view>
+                            <view class="form-group">
+                                <view class="title">宽度</view>
+                                <input type="number" confirm-type="done" bindinput="onRemoteTrackNumberChange" data-index="{{index}}" data-key="remoteTracks[{{index}}].w" value="{{item.w}}" />
+                            </view>
+                        </view>
+                        <view class="flex">
+                            <view class="form-group">
+                                <view class="title">横轴偏移</view>
+                                <input type="number" confirm-type="done" bindinput="onRemoteTrackNumberChange" data-index="{{index}}" data-key="remoteTracks[{{index}}].x" value="{{item.x}}" />
+                            </view>
+                            <view class="form-group">
+                                <view class="title">纵轴偏移</view>
+                                <input type="number" confirm-type="done" bindinput="onRemoteTrackNumberChange" data-index="{{index}}" data-key="remoteTracks[{{index}}].y" value="{{item.y}}" />
+                            </view>
+                        </view>
+                        <view class="form-group">
+                            <view class="title">深度偏移</view>
+                            <input type="number" confirm-type="done" bindinput="onRemoteTrackNumberChange" data-index="{{index}}" data-key="remoteTracks[{{index}}].z" value="{{item.z}}" />
+                        </view>
+                        <picker mode="selector" value="{{item.stretchMode}}" bindchange="onRemoteTrackChange" data-index="{{index}}" data-key="remoteTracks[{{index}}].stretchMode" range="{{stretchModeList}}">
+                            <view class="form-group font-size-30 color-normal">
+                                选择画面填充方式：{{stretchModeList[item.stretchMode]}}
+                            </view>
+                        </picker>
+                    </block>
+                </view>
+            </scroll-view>
+        </view>
+    </view>
+</view>
