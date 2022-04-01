@@ -396,19 +396,24 @@ Page({
         item.y = 0;
         item.z = 0;
         item.stretchMode = 0;
+        item.on("mute-state-changed", () => {
+          this.setData({
+            subscribeList: this.data.subscribeList
+          })
+        })
       })
       this.setData({ remoteTracks: [...this.data.remoteTracks, ...remoteTracks] });
       if (this.data.subscribeList.find((item) => item.userID === user)) {
         return false;
       }
       let config = {};
-      let videoTrack = tracks.find((item) => item.isVideo());
-      let audioTrack = tracks.find((item) => item.isAudio());
-      if (videoTrack) {
-        config.videoTrack = videoTrack;
+      let videoTrackIndex = remoteTracks.findIndex((item) => item.isVideo());
+      let audioTrackIndex = remoteTracks.findIndex((item) => item.isAudio());
+      if (videoTrackIndex >= 0) {
+        config.videoTrack = remoteTracks[videoTrackIndex];
       }
-      if (audioTrack) {
-        config.audioTrack = audioTrack;
+      if (audioTrackIndex >= 0) {
+        config.audioTrack = remoteTracks[audioTrackIndex];
       }
       const url = await client.subscribe(config);
       this.setData({
@@ -418,6 +423,8 @@ Page({
             url,
             key: user + Math.random().toString(36).slice(-8),
             userID: user,
+            audioTrack: remoteTracks[audioTrackIndex],
+            videoTrack: remoteTracks[videoTrackIndex]
           },
         ],
       });
@@ -454,9 +461,11 @@ Page({
     });
   },
   handlePusherStateChange(e) {
+    QNRTC.updatePusherStateChange(e);
     console.log("pusher state", e.detail.code, e.detail.message);
   },
   handlerPusherNetStatus(e) {
+    QNRTC.updatePusherNetStatus(e);
     console.log(
       "pusher net status",
       "videoBitrate: ",
@@ -466,9 +475,11 @@ Page({
     );
   },
   handlePlayerStateChange(e) {
+    QNRTC.updatePlayerStateChange(e);
     console.log("player state", e.detail.code, e.detail.message);
   },
   handlePlayerNetStatus(e) {
+    QNRTC.updatePlayerNetStatus(e);
     console.log(
       "player net status",
       "videoBitrate: ",

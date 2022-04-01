@@ -288,6 +288,31 @@ declare class QNRTC {
      *
      */
     static setLogLevel(level: QNLogLevel): void;
+    /**
+     * 上报拉流状态
+     * @since 4.0.2 当收到 live-player 组件报告的网络状态通知时，你可以调用该接口上传
+     * @param e live-player 组件监听 bindnetstatus 事件触发的回调数据
+     */
+    static updatePlayerStateChange(e: any): void;
+    /**
+     * 上报拉流过程中的网络状态
+     * @since 4.0.2 当收到 live-player 组件报告的拉流状态变化通知时，你可以调用该接口上传
+     * @param e live-player 组件监听 bindstatechange 事件触发的回调数据
+     */
+    static updatePlayerNetStatus(e: any): void;
+    /**
+     * 上报推流状态
+     * @since 4.0.2 当收到 live-pusher 组件报告的网络状态通知时，你可以调用该接口上传
+     * @param e live-pusher 组件监听 bindnetstatus 事件触发的回调数据
+     */
+    static updatePusherStateChange(e: any): void;
+    /**
+     * 上报推流过程中的网络状态
+     * @since 4.0.2 当收到 live-pusher 组件报告的推流状态变化通知时，你可以调用该接口上传
+     * @param e live-pusher 组件监听 bindstatechange 事件触发的回调数据
+     *
+     */
+    static updatePusherNetStatus(e: any): void;
 }
 export default QNRTC;
 

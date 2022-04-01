@@ -2,7 +2,7 @@
   <view class="screen-main">
     <view class="screen-item">
       <live-pusher
-        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
+        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-12 row-6' : 'col-12 row-12' }}"
         autopush
         wx:if="{{publishPath!==''}}"
         beauty="{{beauty}}"
@@ -24,7 +24,7 @@
       >
       </live-pusher>
       <live-player
-        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-6 row-6' : 'col-12 row-12' }}"
+        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-6 row-6' : subscribeList.length > 0 ? 'col-12 row-6' : 'col-12 row-12' }}"
         wx:key="key"
         wx:for="{{subscribeList}}"
         autoplay
@@ -38,6 +38,9 @@
         bindstatechange="handlePlayerStateChange"
         bindnetstatus="handlePlayerNetStatus"
       >
+      <view class="track-info">
+        <view class="track-icon {{!item.audioTrack._muted ? 'screen-icon-mic' : 'screen-icon-mic-off'}}"></view>
+      </view>
       </live-player>
     </view>
   </view>

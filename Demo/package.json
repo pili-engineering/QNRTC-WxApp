@@ -1,14 +1,7 @@
 {
-  "name": "demo",
-  "private": true,
-  "dependencies": {
-    "blueimp-md5": "^2.18.0",
-    "events": "^3.2.0",
-    "fingerprintjs2": "^2.1.2",
-    "gzip-js": "^0.3.2",
-    "js-base64": "^3.5.2",
-    "qnwxapp-rtc": "4.0.1",
-    "qiniu-wx-player": "0.1.1",
-    "wolfy87-eventemitter": "^5.2.9"
-  }
+	"name": "demo",
+	"private": true,
+	"dependencies": {
+		"qnwxapp-rtc": "4.0.2"
+	}
 }
