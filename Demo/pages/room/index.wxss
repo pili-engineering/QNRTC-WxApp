@@ -56,6 +56,18 @@
   background-position: center;
 }
 
+.track-icon {
+  width: 35rpx;
+  margin: 0 32rpx;
+  height: 35rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: none;
+  background-repeat: no-repeat;
+  background-size:contain;
+  background-position: center;
+}
+
 .screen-item {
   display: flex;
   flex-direction: row-reverse;
@@ -141,4 +153,10 @@
 .screen-model-inner {
   width: 100%;
 
+}
+
+.track-info{
+  position:absolute;
+  top: 10rpx;
+  right: 10rpx;
 }
