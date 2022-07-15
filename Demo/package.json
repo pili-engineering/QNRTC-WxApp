@@ -2,6 +2,6 @@
 	"name": "demo",
 	"private": true,
 	"dependencies": {
-		"qnwxapp-rtc": "4.0.2"
+		"qnwxapp-rtc": "4.0.4"
 	}
 }
