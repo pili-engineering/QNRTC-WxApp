@@ -181,7 +181,7 @@ Page({
         this.setData({
           publishPath: data.url,
         });
-      } else if (status === "COMPLATED") {
+      } else if (status === "COMPLETED") {
         console.log("local-track-add", data.tracks);
         const remoteTracks = [...data.tracks];
         remoteTracks.forEach(item => {
@@ -279,7 +279,6 @@ Page({
   // 离开房间
   onPhoneTab() {
     // leave room
-    this.leaveRoom();
     wx.navigateBack({ delta: 1 });
   },
   // 切换摄像头
@@ -534,6 +533,9 @@ Page({
       if (app.roomToken) {
         this.initRoomWithToken(app.roomToken, app.url)
           .then(() => {
+            if (pushContext) {
+              pushContext.start();
+            }
             wx.hideToast({
               fail: () => {
                 console.log("消息隐藏失败");
@@ -547,6 +549,9 @@ Page({
       } else if (this.appid && this.roomName && this.userid) {
         this.initRoom(this.appid, this.roomName, this.userid, app.url)
           .then(() => {
+            if (pushContext) {
+              pushContext.start();
+            }
             wx.hideToast({
               fail: () => {
                 console.log("消息隐藏失败");
