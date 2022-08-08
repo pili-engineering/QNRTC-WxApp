@@ -203,7 +203,7 @@ export declare enum QNPublishStatus {
     /**
      * 连接完成，返回对应本地轨
      */
-    COMPLATED = "COMPLATED",
+    COMPLETED = "COMPLETED",
     /**
      * 连接错误
      */
