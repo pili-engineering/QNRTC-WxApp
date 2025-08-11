@@ -1,5 +1,5 @@
 button.plain {
-  margin-top: 120rpx;
+  margin-top: 30rpx;
   color: #FAFAFA;
   background-color: #34AADC;
   line-height: 50px;
@@ -31,4 +31,22 @@ button.plain.button-hover {
   height: 45px;
   border-radius: 90px;
   background-color: #49494B;
+}
+
+.left {
+  height: 24px;
+  position: absolute;
+  left: 0;
+  z-index: 2;
+}
+
+.left navigator image {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  left: 0;
+}
+
+.last-input {
+  margin-bottom: 90rpx
 }

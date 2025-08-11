@@ -1,5 +1,5 @@
 <view class="main" hover-class="none" hover-stop-propagation="false"><slot></slot></view>
-<view class="footer">
+<view wx:if="{{!hideFooter}}" class="footer">
   <image class="logo item" src="../../assets/icons/ic_niu_logo.png" mode="aspectFit" lazy-load="false">
   </image>
   <view class="item vertical-line">

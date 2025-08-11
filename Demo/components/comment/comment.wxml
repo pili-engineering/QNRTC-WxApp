@@ -5,10 +5,6 @@
             <scroll-view scroll-y class="{{isIPX?'ipxScrollView':'scrollView'}}">
                 <view class="comment-item">
                     <view class="form-group">
-                        <view class="title">合流发布地址</view>
-                        <input type="text" disabled bindinput="onFormDataChange" data-key="mergeOption.publishUrl" value="{{mergeOption.publishUrl}}" />
-                    </view>
-                    <view class="form-group">
                         <view class="title">合流id</view>
                         <input type="text" confirm-type="done" disabled="{{jobStatus === 2}}" bindinput="onFormDataChange" data-key="mergeOption.id" value="{{mergeOption.id}}" />
                     </view>
@@ -93,7 +89,7 @@
                         </view>
                     </view>
                 </view>
-                <view class="comment-item margin-top-60" wx:for="{{mergeOption.watermarks}}" wx:key="*this">
+                <view class="comment-item margin-top-60" wx:for="{{mergeOption.watermarks}}" wx:key="url">
                     <button class="btn bg-danger comment-btn" bindtap="handleCloseWatermarks" data-index="{{index}}">
                         删除水印
                     </button>
@@ -138,7 +134,7 @@
                 </button>
             </view>
             <scroll-view scroll-y style="height:694rpx">
-                <view class="comment-item margin-top-60" wx:for="{{remoteTracks}}" wx:key="*this">
+                <view class="comment-item margin-top-60" wx:for="{{remoteTracks}}" wx:key="_trackID">
                     <button class="btn bg-normal comment-btn" wx:if="{{!item.status}}" bindtap="handleAddMergeTracks" data-index="{{index}}">
                         加入合流
                     </button>

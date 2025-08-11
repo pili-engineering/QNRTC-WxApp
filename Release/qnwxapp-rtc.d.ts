@@ -313,6 +313,15 @@ declare class QNRTC {
      *
      */
     static updatePusherNetStatus(e: any): void;
+    /**
+     * 设置信令地址
+     * @param signalingUrl 信令地址
+     */
+    static set signalingUrl(signalingUrl: string);
+    /**
+     * 获取信令地址
+     */
+    static get signalingUrl(): string;
 }
 export default QNRTC;
 
@@ -320,6 +329,7 @@ export default QNRTC;
  * RTC 核心类
  */
 export declare class QNRTCClient extends QNCore {
+    private static _SIGNALING_URL;
     /**
      * 加入房间
      * @param token - 房间token
@@ -408,6 +418,15 @@ export declare class QNRTCClient extends QNCore {
      * @throws {@link ERROR_INVALID_PARAMETER} 非法参数
      */
     removeTranscodingLiveStreamingTracks(streamID: string, transcodingTracks: QNTranscodingLiveStreamingTrack[]): Promise<void>;
+    /**
+     * 设置信令地址
+     * @param signalingUrl 信令地址
+     */
+    static set SIGNALINGURL(signalingUrl: string);
+    /**
+     * 获取信令地址
+     */
+    static get SIGNALINGURL(): string;
 }
 
 /**

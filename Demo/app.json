@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/chat/index",
     "pages/room/index",
     "pages/setting/index"
   ],

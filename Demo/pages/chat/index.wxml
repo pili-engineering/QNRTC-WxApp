@@ -1,0 +1,56 @@
+<main hideFooter="{{true}}">
+  
+  <view class="screen" hover-class="none" hover-stop-propagation="false">
+    
+    <view class="screen-main">
+      <view class="screen-broadcaster-wrapper">
+        <view class="screen-broadcaster">
+          <live-pusher
+            class="item screen-player"
+            autopush
+            wx:if="{{publishPath!==''}}"
+            enable-camera="{{camera}}"
+            audio-reverb-type="{{audioReveb}}"
+            min-bitrate="200"
+            max-bitrate="400"
+            mode="RTC"
+            playerid="{{playerId}}"
+            muted="{{!mic}}"
+            url="{{publishPath}}"
+            push-context="{{pushContext}}"
+            bindstatechange="handlePusherStateChange"
+            bindnetstatus="handlerPusherNetStatus"
+          >
+          </live-pusher>
+          <user muted="{{!mic}}" name="{{playerId}}"></user>
+        </view>
+      </view>
+      <view class="screen-guest">
+        <view class="guest-item" wx:key="key" wx:for="{{subscribeList}}">
+          <live-player
+              class="item screen-player"
+              autoplay
+              min-cache="0.2"
+              max-cache="0.8"
+              playerid="{{item.userID}}"
+              src="{{item.url}}"
+              mode="RTC"
+              muted="{{!volume}}"
+              object-fit="fillCrop"
+              bindstatechange="handlePlayerStateChange"
+              bindnetstatus="handlePlayerNetStatus"
+              auto-pause-if-navigate="false"
+              auto-pause-if-open-native="false"
+            >
+          </live-player>
+          <user muted="{{item.audioTrack._muted}}" name="{{item.userID}}"></user>
+        </view>
+      </view>
+      <view class="footer">
+        <button bind:tap="toggleMic" class="screen-icon {{mic ? 'screen-icon-mic' : 'screen-icon-mic-off'}}"></button>
+        <button bind:tap="onPhoneTab" class="screen-icon screen-icon-phone"></button>
+        <button bind:tap="toggleVolume" class="screen-icon {{volume ? 'screen-icon-volume-up' : 'screen-icon-volume-off'}}"></button>
+      </view>
+    </view>
+  </view>
+</main>

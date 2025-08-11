@@ -1,5 +1,9 @@
 Component({
   properties: {
+    hideFooter: {
+      type: Boolean,
+      value: false
+    }
   },
   data: {
   },

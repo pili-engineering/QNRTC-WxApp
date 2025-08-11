@@ -1,5 +1,5 @@
 {
   "usingComponents": {
-    "main": "../../components/main/index"
+    "main": "/components/main/index"
   }
 }

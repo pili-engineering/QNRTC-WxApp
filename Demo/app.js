@@ -2,7 +2,7 @@ import { checkPermission } from './common/utils'
 
 App({
   roomName: undefined,
-  appid: 'g2m0ya7w7',
+  appid: 'd8lk7l4ed',
   userId: undefined,
   roomToken: undefined,
   url: 'wss://rtmpgate.cloudvdn.com/',

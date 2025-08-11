@@ -1,4 +1,5 @@
 import { verifyUserId } from '../../common/utils'
+import QNRTC from "qnwxapp-rtc"
 
 Page({
   data: {
@@ -10,7 +11,7 @@ Page({
     const app = getApp()
     this.setData({
       appid: app.appid ? app.appid : '',
-      url: app.url ? app.url : '',
+      url: QNRTC.signalingUrl || '',
       userId: wx.getStorageSync('userId') ? wx.getStorageSync('userId') : ''
     })
   },
@@ -24,28 +25,49 @@ Page({
     this.setData({ url: e.detail.value })
   },
   onSubmit() {
-    const app = getApp()
-    const value = this.data
-    if (value.appid) {
-      app.appid = value.appid
-    }
+    const app = getApp();
 
-    if (value.url) {
-      app.url = value.url
-    }
+    let { appid = '', userId = '', url = '' } = this.data;
 
-    if (verifyUserId(value.userId)) {
-      wx.setStorageSync('userId', value.userId)
-    } else {
+    appid = appid.trim();
+    userId = userId.trim();
+    url = url.trim();
+
+    if (!verifyUserId(userId)) {
       wx.showToast({
         title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
         icon: 'none',
         duration: 2000,
         fail: data => console.log('fail', data)
-      })
-      return
+      });
+      return;
     }
 
-    wx.navigateBack({ delta: 1 })
+    if (!appid) {
+      wx.showToast({
+        title: '请输入appid',
+        icon: 'none',
+        duration: 2000,
+        fail: data => console.log('fail', data)
+      });
+      return;
+    }
+
+    if (!url) {
+      wx.showToast({
+        title: '请输入信令地址',
+        icon: 'none',
+        duration: 2000,
+        fail: data => console.log('fail', data)
+      });
+      return;
+    }
+    wx.setStorageSync('userId',  userId);
+
+    app.appid = appid;
+
+    QNRTC.signalingUrl = url;
+
+    wx.navigateBack({ delta: 1 });
   },
 })

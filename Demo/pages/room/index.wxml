@@ -2,12 +2,13 @@
   <view class="screen-main">
     <view class="screen-item">
       <live-pusher
-        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-12 row-6' : 'col-12 row-12' }}"
+        style="display: {{connected ? 'inherit' : 'none'}}"
+        class="item screen-player {{mirror ? 'mirror' : ''}} {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-12 row-6' : subscribeList.length > 0 ? 'col-12 row-6' : 'col-12 row-12' }}"
         autopush
         wx:if="{{publishPath!==''}}"
         beauty="{{beauty}}"
         whiteness="{{whiteness}}"
-        local-mirror="{{mirror ? 'enable' : 'disable'}}"
+        local-mirror="auto"
         remote-mirror="{{mirror}}"
         enable-camera="{{camera}}"
         filter="{{filterResult}}"
@@ -24,13 +25,13 @@
       >
       </live-pusher>
       <live-player
-        class="item sceen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-6 row-6' : subscribeList.length > 0 ? 'col-12 row-6' : 'col-12 row-12' }}"
+        class="item screen-player {{ subscribeList.length > 3 ? 'col-4 row-4' : subscribeList.length > 2 ? 'col-6 row-6' : subscribeList.length > 1 ? 'col-6 row-6' : subscribeList.length > 0 ? 'col-12 row-6' : 'col-12 row-12' }}"
         wx:key="key"
         wx:for="{{subscribeList}}"
         autoplay
-        min-cache="0.1"
-        max-cache="0.1"
-        playerid="{{item.key}}"
+        min-cache="0.2"
+        max-cache="0.8"
+        playerid="{{item.userID}}"
         src="{{item.url}}"
         mode="RTC"
         muted="{{!volume}}"
@@ -44,7 +45,7 @@
       </live-player>
     </view>
   </view>
-  <view class="sceen-aside">
+  <view class="screen-aside">
     <view bind:tap="handleStartDirectLiveStreaming" class="screen-aside-wrap">
     <image src="../../assets/icons/cdn.png" 	mode="widthFix" class="aside-img" />
       <view class="text-sm margin-top-15">{{directLiveStatus ? '停止转推' : '开始转推'}}</view>
@@ -58,7 +59,7 @@
       <view class="text-sm margin-top-15">聊天</view>
     </view>
   </view>
-  <view class="sceen-aside-left">
+  <view class="screen-aside-left">
     <view bind:tap="openBeauty" class="screen-aside-wrap">
       <image src="../../assets/icons/beautify.png" 	mode="widthFix" class="aside-img" />
       <view class="text-sm margin-top-15">美颜</view>
@@ -83,6 +84,10 @@
           </view>
         </view>
     </picker>
+    <view class="screen-aside-wrap" bindtap="toggleMirror">
+      <image src="../../assets/icons/mirror.png" mode="widthFix" class="aside-img" />
+      <view class="text-sm margin-top-15">视频镜像</view>
+    </view>
   </view>
   <view class="screen-model" wx:if="{{model}}" bindtap="closeModel">
     <view class="screen-model-wrap" >
@@ -94,10 +99,10 @@
   <chat show="{{chatModal}}" bindclose="handleCloseChat" userList="{{userList}}" messageList="{{messageList}}"></chat>
   <view class="screen-footer">
     <view class="flex justify-center">
-      <button bind:tap="toggleMic" class="sceen-icon {{mic ? 'screen-icon-mic' : 'screen-icon-mic-off'}}"></button>
-      <button bind:tap="onPhoneTab" class="sceen-icon screen-icon-phone"></button>
-      <button bind:tap="toggleVolume" class="sceen-icon {{volume ? 'screen-icon-volume-up' : 'screen-icon-volume-off'}}"></button>
-      <button bind:tap="switchCamera" class="sceen-icon screen-icon-camera-switc-end"></button>
+      <button bind:tap="toggleMic" class="screen-icon {{mic ? 'screen-icon-mic' : 'screen-icon-mic-off'}}"></button>
+      <button bind:tap="onPhoneTab" class="screen-icon screen-icon-phone"></button>
+      <button bind:tap="toggleVolume" class="screen-icon {{volume ? 'screen-icon-volume-up' : 'screen-icon-volume-off'}}"></button>
+      <button bind:tap="switchCamera" class="screen-icon screen-icon-camera-switc-end"></button>
     </view>
   </view>
 </view>

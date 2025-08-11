@@ -1,0 +1,8 @@
+<view class="user-wrapper" style="width: {{width}}">
+  <view class="user-joined">
+    <view class="user-info">
+      <view class="user-text" wx:if="{{!!name}}">{{name}}</view>
+    </view>
+    <view class="screen-icon-pos {{muted ? 'screen-icon-mic-off' : 'screen-icon-mic'}}"></view>
+  </view>
+</view>

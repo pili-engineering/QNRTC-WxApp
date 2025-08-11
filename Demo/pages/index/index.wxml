@@ -3,16 +3,17 @@
     <navigator
       url="/pages/setting/index"
     >
-      <image src="../../assets/icons/setting.png" mode="aspectFit"></image>
+      <image src="/assets/icons/setting.png" mode="aspectFit"></image>
     </navigator>
   </view>
   <input class="input" name="userId" type="text" placeholder-class="input-placeholder"
     maxlength="50" placeholder="用户名"
     bindinput="onUserIdInput" value="{{userId}}"
   />
-  <input class="input" name="roomName" type="text" placeholder-class="input-placeholder" 
+  <input class="input last-input" name="roomName" type="text" placeholder-class="input-placeholder" 
     maxlength="64" focus placeholder="房间名名称"
     bindinput="onRoomNameInput" value="{{roomName}}"
   />
-  <button class="plain" bind:tap="onSubmit">会议房间</button>
+  <button class="plain" bind:tap="onSubmit" data-type="meeting">开始会议</button>
+  <button class="plain" bind:tap="onSubmit" data-type="chatting">语音聊天</button>
 </main>

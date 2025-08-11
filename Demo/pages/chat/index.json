@@ -1,0 +1,9 @@
+{
+    "disableScroll": true,
+    "usingComponents": {
+      "comment":"/components/comment/comment",
+      "chat": "/components/chat/chat",
+      "main": "/components/main/index",
+      "user": "/components/user/index"
+    }
+  }

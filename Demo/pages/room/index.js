@@ -18,7 +18,7 @@ Page({
     camera: true,
     beauty: 0,
     whiteness: 0,
-    mirror: false,
+    mirror: true,
     audioRevebList: ["关闭", "KTV", "小房间", "大会堂", "低沉", "洪亮", "金属声", "磁性"], 
     audioReveb: 0,
     filterList: [
@@ -75,7 +75,8 @@ Page({
     messageList: [],
     isShowToast: false,
     modelType: "",
-    model: false
+    model: false,
+    connected: false,
   },
   onLoad(query) {
     console.log(query);
@@ -180,6 +181,7 @@ Page({
       if (status === "READY") {
         this.setData({
           publishPath: data.url,
+          connected: true,
         });
       } else if (status === "COMPLETED") {
         console.log("local-track-add", data.tracks);
@@ -402,31 +404,29 @@ Page({
         })
       })
       this.setData({ remoteTracks: [...this.data.remoteTracks, ...remoteTracks] });
-      if (this.data.subscribeList.find((item) => item.userID === user)) {
-        return false;
-      }
       let config = {};
-      let videoTrackIndex = remoteTracks.findIndex((item) => item.isVideo());
-      let audioTrackIndex = remoteTracks.findIndex((item) => item.isAudio());
-      if (videoTrackIndex >= 0) {
-        config.videoTrack = remoteTracks[videoTrackIndex];
+      let videoList = remoteTracks.filter(item => item.isVideo());
+      let audioList = remoteTracks.filter(item => item.isAudio());
+      while (videoList.length) {
+        config.videoTrack = videoList.pop();
+        config.audioTrack && delete config.audioTrack
+        if (audioList.length) {
+          config.audioTrack = audioList.pop();
+        }
+        const url = await client.subscribe(config);
+        this.setData({
+          subscribeList: [
+            ...this.data.subscribeList,
+            {
+              url,
+              key: user + Math.random().toString(36).slice(-8),
+              userID: user,
+              audioTrack: config.audioTrack,
+              videoTrack: config.videoTrack
+            },
+          ],
+        });
       }
-      if (audioTrackIndex >= 0) {
-        config.audioTrack = remoteTracks[audioTrackIndex];
-      }
-      const url = await client.subscribe(config);
-      this.setData({
-        subscribeList: [
-          ...this.data.subscribeList,
-          {
-            url,
-            key: user + Math.random().toString(36).slice(-8),
-            userID: user,
-            audioTrack: remoteTracks[audioTrackIndex],
-            videoTrack: remoteTracks[videoTrackIndex]
-          },
-        ],
-      });
     });
     client.on("user-unpublished", (user, tracks) => {
       console.log("event: user-unpublished - 用户取消发布", user, tracks);
@@ -521,21 +521,14 @@ Page({
       fail: (data) => console.log("fail", data),
     });
     this.setData({
-      publishPath: "",
+      connected: false,
       subscribeList: [],
     });
-    const { pushContext } = this.data;
-    if (pushContext) {
-      pushContext.stop();
-    }
     this.reconnectTimer = setTimeout(() => {
       const app = getApp();
       if (app.roomToken) {
         this.initRoomWithToken(app.roomToken, app.url)
           .then(() => {
-            if (pushContext) {
-              pushContext.start();
-            }
             wx.hideToast({
               fail: () => {
                 console.log("消息隐藏失败");
@@ -549,9 +542,6 @@ Page({
       } else if (this.appid && this.roomName && this.userid) {
         this.initRoom(this.appid, this.roomName, this.userid, app.url)
           .then(() => {
-            if (pushContext) {
-              pushContext.start();
-            }
             wx.hideToast({
               fail: () => {
                 console.log("消息隐藏失败");

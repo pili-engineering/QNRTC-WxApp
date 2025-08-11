@@ -2,57 +2,50 @@ import { verifyRoomId, verifyUserId } from '../../common/utils'
 
 Page({
   data: {
-    startPlay: false,
-    userId: wx.getStorageSync('userId') || '',
-    roomName: '',
-    roomToken: '',
+    userId: '',
+    roomName: ''
   },
   onShow() {
     this.setData({ userId: wx.getStorageSync('userId') })
   },
-  onUserIdInput: function(e) {
+  onUserIdInput(e) {
     this.setData({ userId: e.detail.value })
   },
-  onRoomNameInput: function(e) {
+  onRoomNameInput(e) {
     this.setData({ roomName: e.detail.value })
   },
-  onTokenInput: function(e) {
-    this.setData({ roomToken: e.detail.value })
-  },
-  onSubmit: function() {
+  onSubmit(e) {
+    console.log(e)
     const value = this.data
-    console.log('submit', value)
     const app = getApp()
-    app.roomToken = undefined
-    if (value.roomToken) {
-      app.roomToken = value.roomToken
-      wx.navigateTo({
-        url: `/pages/room/index`,
-      })
+    if (verifyRoomId(value.roomName)) {
+      app.roomName = value.roomName
     } else {
-      if (verifyRoomId(value.roomName)) {
-        app.roomName = value.roomName
-      } else {
-        wx.showToast({
-          title: '房间名最少 3 个字符，并且只能包含字母、数字或下划线',
-          icon: 'none',
-          duration: 2000,
-          fail: data => console.log('fail', data)
-        })
-        return;
-      }
-      if (verifyUserId(value.userId)) {
-        app.userId = value.userId
-        wx.setStorageSync('userId', value.userId)
-      } else {
-        wx.showToast({
-          title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
-          icon: 'none',
-          duration: 2000,
-          fail: data => console.log('fail', data)
-        })
-        return;
-      }
+      wx.showToast({
+        title: '房间名最少 3 个字符，并且只能包含字母、数字或下划线',
+        icon: 'none',
+        duration: 2000,
+        fail: data => console.log('fail', data)
+      })
+      return;
+    }
+    if (verifyUserId(value.userId)) {
+      app.userId = value.userId
+      wx.setStorageSync('userId', value.userId)
+    } else {
+      wx.showToast({
+        title: '用户名最少 3 个字符，并且只能包含字母、数字或下划线',
+        icon: 'none',
+        duration: 2000,
+        fail: data => console.log('fail', data)
+      })
+      return;
+    }
+    if (e.target.dataset.type === "chatting") {
+      wx.navigateTo({
+        url: `/pages/chat/index?appid=${app.appid}&room=${value.roomName}&userId=${value.userId}`,
+      })
+    } else if (e.target.dataset.type === "meeting") {
       wx.navigateTo({
         url: `/pages/room/index?appid=${app.appid}&room=${value.roomName}&userId=${value.userId}`,
       })
